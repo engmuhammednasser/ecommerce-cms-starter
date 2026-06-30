@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-label="Demo banner">
+  <rect width="1200" height="420" fill="#ecfeff"/>
+  <rect x="64" y="64" width="1072" height="292" rx="32" fill="#0f766e"/>
+  <rect x="112" y="126" width="360" height="48" rx="10" fill="#f8fafc"/>
+  <rect x="112" y="198" width="520" height="28" rx="8" fill="#ccfbf1"/>
+  <rect x="112" y="248" width="180" height="48" rx="12" fill="#facc15"/>
+  <circle cx="906" cy="210" r="116" fill="#f8fafc"/>
+  <rect x="846" y="150" width="120" height="120" rx="18" fill="#14b8a6"/>
+</svg>
