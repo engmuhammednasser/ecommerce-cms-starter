@@ -3,11 +3,13 @@
         <ul class="navbar-nav">
             <li class="nav-item">
                 <button class="nav-link btn btn-link" type="button" data-lte-toggle="sidebar" aria-label="Toggle sidebar">
-                    <span class="navbar-toggler-icon"></span>
+                    <svg class="admin-header-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
                 </button>
             </li>
             <li class="nav-item d-none d-md-block">
-                <a href="#" class="nav-link">Dashboard</a>
+                <a href="{{ route('admin.dashboard') }}" class="nav-link">{{ setting('general.site_name', config('app.name', 'Laravel')) }}</a>
             </li>
         </ul>
 

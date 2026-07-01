@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Media;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -20,7 +21,7 @@ class MediaController extends Controller
         return view('admin.media.index', compact('mediaItems'));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'file' => ['required', 'file', 'mimes:jpg,jpeg,png,webp,gif,svg,pdf', 'max:10240'],
@@ -31,7 +32,7 @@ class MediaController extends Controller
         $path = $file->store('media', 'public');
         $mimeType = $file->getMimeType();
 
-        Media::create([
+        $media = Media::create([
             'disk' => 'public',
             'path' => $path,
             'original_name' => $file->getClientOriginalName(),
@@ -41,6 +42,21 @@ class MediaController extends Controller
             'type' => str_starts_with((string) $mimeType, 'image/') ? 'image' : 'document',
             'alt_text' => $validated['alt_text'] ?? null,
         ]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Media uploaded successfully.',
+                'media' => [
+                    'id' => $media->id,
+                    'path' => $media->path,
+                    'url' => $media->url(),
+                    'original_name' => $media->original_name,
+                    'alt_text' => $media->alt_text,
+                    'type' => $media->type,
+                    'is_image' => $media->isImage(),
+                ],
+            ]);
+        }
 
         return redirect()
             ->route('admin.media.index')

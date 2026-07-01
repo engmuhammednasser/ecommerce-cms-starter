@@ -14,7 +14,10 @@
     @include('admin.components.card', [
         'title' => 'Products',
         'actions' => '<a href="' . route('admin.products.create') . '" class="btn btn-primary">Create Product</a>',
-        'slot' => view('admin.products._filters', ['categoryOptions' => $categoryOptions])->render(),
+        'slot' => view('admin.products._filters', [
+            'brandOptions' => $brandOptions,
+            'categoryOptions' => $categoryOptions,
+        ])->render(),
     ])
 
     @include('admin.components.card', [

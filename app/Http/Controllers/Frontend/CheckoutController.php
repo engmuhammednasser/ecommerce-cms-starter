@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Coupon;
 use App\Models\Customer;
 use App\Models\Menu;
 use App\Models\Order;
 use App\Models\Product;
+use App\Services\CouponDiscountService;
 use App\Services\OrderNotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,7 +31,7 @@ class CheckoutController extends Controller
             'title' => setting('checkout.title', 'Checkout'),
             'metaTitle' => setting('checkout.title', setting('general.site_name', config('app.name', 'Laravel'))),
             'cart' => $cart,
-            'totals' => $this->checkoutTotals($cart['subtotal']),
+            'totals' => $this->checkoutTotals($cart['subtotal'], $cart['discount']),
             'cashOnDeliveryEnabled' => $this->cashOnDeliveryEnabled(),
         ]));
     }
@@ -53,7 +55,7 @@ class CheckoutController extends Controller
 
         abort_unless($this->cashOnDeliveryEnabled(), 422);
 
-        $totals = $this->checkoutTotals($cart['subtotal']);
+        $totals = $this->checkoutTotals($cart['subtotal'], $cart['discount']);
 
         $order = DB::transaction(function () use ($validated, $cart, $totals): Order {
             $customer = Customer::create([
@@ -73,6 +75,9 @@ class CheckoutController extends Controller
                 'notes' => $validated['notes'] ?? null,
                 'status' => 'pending',
                 'payment_method' => $validated['payment_method'],
+                'coupon_code' => $cart['coupon']['code'] ?? null,
+                'coupon_name' => $cart['coupon']['name'] ?? null,
+                'discount_amount' => $cart['discount'],
                 'subtotal' => $cart['subtotal'],
                 'shipping_amount' => $totals['shipping'],
                 'tax_amount' => $totals['tax'],
@@ -92,10 +97,18 @@ class CheckoutController extends Controller
                 ]);
             }
 
+            if ($cart['coupon']['code'] ?? null) {
+                Coupon::query()
+                    ->where('code', $cart['coupon']['code'])
+                    ->first()
+                    ?->increment('used_count');
+            }
+
             return $order;
         });
 
         $request->session()->forget('cart.items');
+        $request->session()->forget('cart.coupon_code');
         $notifications->orderPlaced($order);
 
         return redirect()->route('checkout.success', $order);
@@ -123,7 +136,7 @@ class CheckoutController extends Controller
     }
 
     /**
-     * @return array{items: Collection<int, array<string, mixed>>, subtotal: float, item_count: int}
+     * @return array{items: Collection<int, array<string, mixed>>, subtotal: float, item_count: int, coupon: array<string, mixed>|null, discount: float}
      */
     private function cartSummary(Request $request): array
     {
@@ -154,10 +167,31 @@ class CheckoutController extends Controller
             ->filter()
             ->values();
 
+        $subtotal = (float) $lines->sum('line_total');
+        $coupon = null;
+        $discount = 0.0;
+        $couponCode = $request->session()->get('cart.coupon_code');
+
+        if ($couponCode) {
+            $result = app(CouponDiscountService::class)->validateCode($couponCode, $subtotal);
+
+            if ($result['valid'] && $result['coupon']) {
+                $coupon = [
+                    'code' => $result['coupon']->code,
+                    'name' => $result['coupon']->name,
+                ];
+                $discount = $result['discount'];
+            } else {
+                $request->session()->forget('cart.coupon_code');
+            }
+        }
+
         return [
             'items' => $lines,
-            'subtotal' => (float) $lines->sum('line_total'),
+            'subtotal' => $subtotal,
             'item_count' => (int) $lines->sum('quantity'),
+            'coupon' => $coupon,
+            'discount' => $discount,
         ];
     }
 
@@ -173,19 +207,20 @@ class CheckoutController extends Controller
     /**
      * @return array{shipping: float, tax: float, total: float}
      */
-    private function checkoutTotals(float $subtotal): array
+    private function checkoutTotals(float $subtotal, float $discount = 0.0): array
     {
+        $discountedSubtotal = max(0, $subtotal - $discount);
         $flatRate = max(0, (float) setting('shipping.flat_rate', 0));
         $freeThreshold = setting('shipping.free_shipping_threshold');
         $freeThreshold = $freeThreshold === null || $freeThreshold === '' ? null : max(0, (float) $freeThreshold);
-        $shipping = $freeThreshold !== null && $subtotal >= $freeThreshold ? 0.0 : $flatRate;
+        $shipping = $freeThreshold !== null && $discountedSubtotal >= $freeThreshold ? 0.0 : $flatRate;
         $taxRate = max(0, (float) setting('tax.percentage', 0));
-        $tax = round($subtotal * ($taxRate / 100), 2);
+        $tax = round($discountedSubtotal * ($taxRate / 100), 2);
 
         return [
             'shipping' => $shipping,
             'tax' => $tax,
-            'total' => $subtotal + $shipping + $tax,
+            'total' => $discountedSubtotal + $shipping + $tax,
         ];
     }
 

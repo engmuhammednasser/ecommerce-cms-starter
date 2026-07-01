@@ -18,6 +18,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'admin_notes',
     'status',
     'payment_method',
+    'coupon_code',
+    'coupon_name',
+    'discount_amount',
     'subtotal',
     'shipping_amount',
     'tax_amount',
@@ -39,6 +42,7 @@ class Order extends Model
             'subtotal' => 'decimal:2',
             'shipping_amount' => 'decimal:2',
             'tax_amount' => 'decimal:2',
+            'discount_amount' => 'decimal:2',
             'total' => 'decimal:2',
         ];
     }

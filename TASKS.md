@@ -668,3 +668,343 @@ Acceptance Criteria:
 
 Do Not:
 - Do not add new features during final verification.
+
+---
+
+# Post-MVP Professional Store Roadmap
+
+These tasks are for turning the starter kit from a strong MVP into a more production-ready professional store.
+Implement one task only at a time.
+
+## TASK-034: Implement payment status foundation
+
+Status: pending
+
+Scope:
+- Add payment status fields to existing order/payment flow.
+- Track statuses such as unpaid, paid, failed, refunded.
+- Keep Cash on Delivery compatible.
+- Prepare the order model/admin order details for payment status display.
+
+Acceptance Criteria:
+- Orders can store payment status separately from order status.
+- Admin can see payment status on order list/details.
+- Existing checkout still works.
+
+Do Not:
+- Do not integrate a real payment gateway in this task.
+- Do not remove Cash on Delivery.
+
+---
+
+## TASK-035: Implement payment gateway integration foundation
+
+Status: pending
+
+Scope:
+- Add a Laravel-native payment gateway abstraction/service.
+- Add configuration settings for one selected gateway.
+- Add payment initiation and callback/webhook placeholders.
+- Keep implementation gateway-specific but isolated.
+
+Acceptance Criteria:
+- Checkout can hand off to a configured payment service.
+- Webhook/callback route can update payment status safely.
+- Failed payment can be handled without creating inconsistent orders.
+
+Do Not:
+- Do not add multiple gateways at once.
+- Do not store sensitive card data.
+
+---
+
+## TASK-036: Implement shipping zones and rates
+
+Status: pending
+
+Scope:
+- Add shipping zones/locations and rates.
+- Support flat rates by zone.
+- Allow checkout to calculate shipping from selected zone.
+- Add admin management for shipping zones/rates.
+
+Acceptance Criteria:
+- Admin can manage shipping zones and rates.
+- Checkout uses configured shipping rates.
+- Existing basic shipping settings remain compatible or are migrated cleanly.
+
+Do Not:
+- Do not integrate external shipping carriers yet.
+- Do not add database-specific SQL.
+
+---
+
+## TASK-037: Implement coupons and discounts
+
+Status: done
+
+Scope:
+- Add coupons module.
+- Support fixed amount and percentage discounts.
+- Support active dates, usage limits, minimum order amount, and status.
+- Apply coupon discounts in cart/checkout.
+
+Acceptance Criteria:
+- Admin can create/edit/delete coupons.
+- Customer can apply a valid coupon.
+- Invalid/expired coupons show clear errors.
+- Order stores applied discount details.
+
+Do Not:
+- Do not add gift cards or loyalty points.
+- Do not add overly complex promotion rules.
+
+---
+
+## TASK-038: Implement inventory management foundation
+
+Status: pending
+
+Scope:
+- Track inventory changes for products.
+- Decrease stock when an order is placed.
+- Restore stock when an order is cancelled/refunded where appropriate.
+- Add low stock indicators/report.
+
+Acceptance Criteria:
+- Stock cannot silently go negative.
+- Admin can see low stock products.
+- Order status changes keep stock consistent.
+
+Do Not:
+- Do not implement warehouse/location inventory yet.
+- Do not implement supplier purchase orders.
+
+---
+
+## TASK-039: Implement product attributes and variants
+
+Status: pending
+
+Scope:
+- Add attributes such as size/color/material.
+- Add product variants with SKU, price, sale price, stock, status, and image if practical.
+- Update admin product management for variants.
+- Update storefront product details to select variants.
+
+Acceptance Criteria:
+- Admin can manage attributes and variants.
+- Customer can select a variant before adding to cart.
+- Cart and orders store selected variant data.
+
+Do Not:
+- Do not break simple products.
+- Do not implement advanced product bundles.
+
+---
+
+## TASK-040: Implement customer accounts and My Account area
+
+Status: pending
+
+Scope:
+- Add customer registration/login/logout.
+- Add My Account dashboard.
+- Show customer order history.
+- Allow customers to manage saved addresses.
+
+Acceptance Criteria:
+- Customers can create accounts and log in.
+- Logged-in customers can view their orders.
+- Guest checkout remains available unless explicitly disabled.
+
+Do Not:
+- Do not build CRM automation.
+- Do not merge admin auth with customer auth.
+
+---
+
+## TASK-041: Improve order lifecycle, invoices, and fulfillment
+
+Status: pending
+
+Scope:
+- Add order status history records.
+- Add invoice/print-friendly order view.
+- Add fulfillment/shipping status fields if needed.
+- Improve admin order notes/timeline.
+
+Acceptance Criteria:
+- Admin can see a reliable timeline of order changes.
+- Orders can be printed or exported as invoice-style pages.
+- Fulfillment status is separate from payment status where appropriate.
+
+Do Not:
+- Do not add carrier integrations yet.
+- Do not add accounting integrations.
+
+---
+
+## TASK-042: Expand email notifications and template management
+
+Status: pending
+
+Scope:
+- Add admin edit UI for email templates.
+- Add preview support for templates.
+- Send order placed/status/payment emails where appropriate.
+- Support queued emails using Laravel queues.
+
+Acceptance Criteria:
+- Admin can edit email templates.
+- Emails are sent for key order events.
+- Templates can be previewed before saving.
+
+Do Not:
+- Do not add third-party email marketing tools.
+- Do not hardcode email content in code.
+
+---
+
+## TASK-043: Implement storefront search, filters, and sorting
+
+Status: pending
+
+Scope:
+- Add product search.
+- Add category, price, stock/status, and sale filters where practical.
+- Add sorting by latest, price, and name.
+- Keep filters SQLite-compatible.
+
+Acceptance Criteria:
+- Customers can search and filter products on shop/category pages.
+- Filter URLs are shareable.
+- Empty results show clear empty states.
+
+Do Not:
+- Do not add external search services.
+- Do not use database-specific full-text search.
+
+---
+
+## TASK-044: Implement product reviews and ratings
+
+Status: pending
+
+Scope:
+- Add product reviews and ratings.
+- Add admin moderation for reviews.
+- Show approved reviews and average rating on storefront product pages.
+
+Acceptance Criteria:
+- Customers can submit reviews.
+- Admin can approve/reject reviews.
+- Product pages show approved reviews only.
+
+Do Not:
+- Do not add third-party review platforms.
+- Do not allow unmoderated spam-prone reviews.
+
+---
+
+## TASK-045: Implement wishlist foundation
+
+Status: pending
+
+Scope:
+- Add customer/session wishlist foundation.
+- Allow adding/removing products from wishlist.
+- Add wishlist storefront page.
+
+Acceptance Criteria:
+- Customers can save products to a wishlist.
+- Wishlist persists for logged-in customers or session users as scoped.
+- Products can be moved from wishlist to cart.
+
+Do Not:
+- Do not implement product comparison in this task.
+- Do not require customer accounts if session wishlist is chosen first.
+
+---
+
+## TASK-046: Implement advanced SEO outputs
+
+Status: pending
+
+Scope:
+- Add XML sitemap generation.
+- Add robots.txt output.
+- Add product/category/page structured data where practical.
+- Add breadcrumb structured data if breadcrumbs exist.
+
+Acceptance Criteria:
+- Sitemap includes published pages/categories/products.
+- Robots output is configurable or safe by default.
+- Product pages include valid structured data.
+
+Do Not:
+- Do not add paid SEO services.
+- Do not hardcode SEO content in Blade.
+
+---
+
+## TASK-047: Implement admin users, roles, and permissions UI
+
+Status: pending
+
+Scope:
+- Add admin UI for admin users.
+- Add admin UI for roles and permissions.
+- Allow assigning roles to admin users.
+- Keep Super Admin access intact.
+
+Acceptance Criteria:
+- Super Admin can manage admin users and roles.
+- Permissions can be reviewed from the admin panel.
+- Existing permission middleware behavior remains intact.
+
+Do Not:
+- Do not replace the existing custom permission foundation.
+- Do not install Spatie unless explicitly approved later.
+
+---
+
+## TASK-048: Implement reports and analytics pages
+
+Status: pending
+
+Scope:
+- Add basic admin reports for sales, orders, products, customers, and inventory.
+- Support date range filters.
+- Add simple dependency-free summaries/tables.
+
+Acceptance Criteria:
+- Admin can review sales by date range.
+- Admin can see top products and recent customer/order activity.
+- Reports remain SQLite-compatible.
+
+Do Not:
+- Do not add heavy charting libraries unless explicitly requested.
+- Do not add external analytics services.
+
+---
+
+## TASK-049: Improve production readiness
+
+Status: pending
+
+Scope:
+- Document queue worker setup.
+- Document cache/config/view optimization commands.
+- Add backup strategy documentation or safe backup foundation.
+- Add production security checklist.
+- Add monitoring/logging recommendations.
+
+Acceptance Criteria:
+- README or production docs explain deployment readiness.
+- Production checklist covers env, queues, cache, storage, backups, and logs.
+- No unsafe destructive maintenance actions are exposed.
+
+Do Not:
+- Do not implement server management UI.
+- Do not require a specific hosting provider.

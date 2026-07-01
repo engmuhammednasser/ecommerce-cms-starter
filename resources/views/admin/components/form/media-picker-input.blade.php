@@ -5,37 +5,53 @@
     $label = $label ?? ucfirst(str_replace('_', ' ', $name));
     $value = old($name, $value ?? '');
     $required = $required ?? false;
-    $help = $help ?? 'Select an existing image from the media library or enter a storage path.';
+    $help = $help ?? 'Select an existing image from the media library.';
 @endphp
 
-<div class="mb-3">
+<div class="mb-3" data-media-picker-field>
     <label for="{{ $id }}" class="form-label">{{ $label }}</label>
-    <div class="input-group">
-        <input
-            id="{{ $id }}"
-            type="{{ $type }}"
-            name="{{ $name }}"
-            value="{{ $value }}"
-            class="form-control @error($name) is-invalid @enderror"
-            data-media-picker-preview="{{ $id }}_preview"
-            @required($required)
-        >
+
+    <input
+        id="{{ $id }}"
+        type="hidden"
+        name="{{ $name }}"
+        value="{{ $value }}"
+        class="@error($name) is-invalid @enderror"
+        data-media-picker-preview="{{ $id }}_preview"
+        @required($required)
+    >
+
+    <div id="{{ $id }}_preview" class="admin-media-picker-preview mb-2" data-media-picker-preview-box>
+        @if ($value)
+            <img src="{{ asset('storage/' . $value) }}" alt="{{ $label }}" class="img-thumbnail admin-media-picker-image">
+        @else
+            <div class="admin-media-picker-empty text-center text-muted border rounded p-4">
+                <div class="fw-semibold text-body">No image selected</div>
+                <div class="small">Choose an image from the media library.</div>
+            </div>
+        @endif
+    </div>
+
+    <div class="d-flex flex-wrap gap-2">
         <button
             type="button"
             class="btn btn-outline-secondary"
             data-media-picker-open
             data-media-picker-target="{{ $id }}"
         >
-            Choose
+            {{ $value ? 'Update Image' : 'Choose Image' }}
         </button>
-        @error($name)
-            <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
+        <button
+            type="button"
+            class="btn btn-outline-danger {{ $value ? '' : 'd-none' }}"
+            data-media-picker-remove
+            data-media-picker-target="{{ $id }}"
+        >
+            Remove Image
+        </button>
     </div>
     <div class="form-text">{{ $help }}</div>
-    <div id="{{ $id }}_preview" class="mt-2">
-        @if ($value)
-            <img src="{{ asset('storage/' . $value) }}" alt="{{ $label }}" class="img-thumbnail" style="width: 96px; height: 96px; object-fit: cover;">
-        @endif
-    </div>
+    @error($name)
+        <div class="invalid-feedback d-block">{{ $message }}</div>
+    @enderror
 </div>

@@ -11,6 +11,11 @@
                 {{ session('success') }}
             </div>
         @endif
+        @if (session('error'))
+            <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                {{ session('error') }}
+            </div>
+        @endif
 
         @if ($cart['items']->isEmpty())
             <div class="rounded-3xl border border-slate-200 bg-white p-10 text-center text-slate-600 shadow-sm">
@@ -78,7 +83,34 @@
                             <dt class="font-semibold">{{ setting('cart.subtotal_label', 'Subtotal') }}</dt>
                             <dd class="font-semibold">{{ number_format($cart['subtotal'], 2) }}</dd>
                         </div>
+                        @if ($cart['coupon'])
+                            <div class="flex justify-between gap-4 text-emerald-700">
+                                <dt>Coupon {{ $cart['coupon']['code'] }}</dt>
+                                <dd>-{{ number_format($cart['discount'], 2) }}</dd>
+                            </div>
+                        @endif
                     </dl>
+                    <div class="mt-6 border-t border-slate-200 pt-4">
+                        @if ($cart['coupon'])
+                            <form method="POST" action="{{ route('cart.coupon.remove') }}" class="flex items-center justify-between gap-3 rounded-2xl bg-emerald-50 p-3 text-sm text-emerald-800">
+                                @csrf
+                                @method('DELETE')
+                                <span>{{ $cart['coupon']['code'] }} applied</span>
+                                <button type="submit" class="font-semibold underline">Remove</button>
+                            </form>
+                        @else
+                            <form method="POST" action="{{ route('cart.coupon.apply') }}" class="space-y-3">
+                                @csrf
+                                <label for="coupon_code" class="block text-sm font-medium text-slate-600">Coupon code</label>
+                                <div class="flex gap-2">
+                                    <input id="coupon_code" name="coupon_code" value="{{ old('coupon_code') }}" class="min-w-0 flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                                    <button type="submit" class="rounded-full border border-slate-950 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-slate-950 hover:text-white">
+                                        Apply
+                                    </button>
+                                </div>
+                            </form>
+                        @endif
+                    </div>
                     <a href="{{ route('checkout.create') }}" class="mt-6 block rounded-full bg-slate-950 px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-slate-700">
                         {{ setting('checkout.button_label', 'Checkout') }}
                     </a>

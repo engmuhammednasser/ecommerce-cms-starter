@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use App\Models\Product;
+use App\Services\CouponDiscountService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -71,6 +72,37 @@ class CartController extends Controller
             ->with('success', 'Product removed from cart.');
     }
 
+    public function applyCoupon(Request $request, CouponDiscountService $coupons): RedirectResponse
+    {
+        $validated = $request->validate([
+            'coupon_code' => ['required', 'string', 'max:50'],
+        ]);
+
+        $cart = $this->cartSummary($request);
+        $result = $coupons->validateCode($validated['coupon_code'], $cart['subtotal']);
+
+        if (! $result['valid']) {
+            return redirect()
+                ->route('cart.show')
+                ->with('error', $result['message']);
+        }
+
+        $request->session()->put('cart.coupon_code', $result['coupon']?->code);
+
+        return redirect()
+            ->route('cart.show')
+            ->with('success', 'Coupon applied.');
+    }
+
+    public function removeCoupon(Request $request): RedirectResponse
+    {
+        $request->session()->forget('cart.coupon_code');
+
+        return redirect()
+            ->route('cart.show')
+            ->with('success', 'Coupon removed.');
+    }
+
     /**
      * @return array<string, int>
      */
@@ -82,7 +114,7 @@ class CartController extends Controller
     }
 
     /**
-     * @return array{items: Collection<int, array<string, mixed>>, subtotal: float, item_count: int}
+     * @return array{items: Collection<int, array<string, mixed>>, subtotal: float, item_count: int, coupon: array<string, mixed>|null, discount: float}
      */
     private function cartSummary(Request $request): array
     {
@@ -114,10 +146,30 @@ class CartController extends Controller
             ->filter()
             ->values();
 
+        $coupon = null;
+        $discount = 0.0;
+        $couponCode = $request->session()->get('cart.coupon_code');
+
+        if ($couponCode) {
+            $result = app(CouponDiscountService::class)->validateCode($couponCode, (float) $lines->sum('line_total'));
+
+            if ($result['valid'] && $result['coupon']) {
+                $coupon = [
+                    'code' => $result['coupon']->code,
+                    'name' => $result['coupon']->name,
+                ];
+                $discount = $result['discount'];
+            } else {
+                $request->session()->forget('cart.coupon_code');
+            }
+        }
+
         return [
             'items' => $lines,
             'subtotal' => (float) $lines->sum('line_total'),
             'item_count' => (int) $lines->sum('quantity'),
+            'coupon' => $coupon,
+            'discount' => $discount,
         ];
     }
 

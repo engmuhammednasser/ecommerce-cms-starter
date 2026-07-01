@@ -8,6 +8,14 @@
     <dt class="col-sm-6">Tax</dt>
     <dd class="col-sm-6 text-sm-end">{{ number_format((float) $order->tax_amount, 2) }}</dd>
 
+    @if ($order->coupon_code)
+        <dt class="col-sm-6">Coupon</dt>
+        <dd class="col-sm-6 text-sm-end">{{ $order->coupon_code }}</dd>
+
+        <dt class="col-sm-6">Discount</dt>
+        <dd class="col-sm-6 text-sm-end">-{{ number_format((float) $order->discount_amount, 2) }}</dd>
+    @endif
+
     <dt class="col-sm-6">Payment</dt>
     <dd class="col-sm-6 text-sm-end">{{ $order->payment_method === 'cash_on_delivery' ? 'Cash on delivery' : 'Not set' }}</dd>
 

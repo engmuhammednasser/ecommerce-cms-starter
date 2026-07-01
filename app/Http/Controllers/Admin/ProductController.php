@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Services\ActivityLogger;
@@ -17,7 +18,7 @@ class ProductController extends Controller
     public function index(Request $request): View
     {
         $products = Product::query()
-            ->with('category')
+            ->with('brand', 'category')
             ->when($request->filled('search'), function ($query) use ($request): void {
                 $search = $request->string('search')->toString();
 
@@ -33,6 +34,9 @@ class ProductController extends Controller
             ->when($request->filled('category_id'), function ($query) use ($request): void {
                 $query->where('category_id', $request->integer('category_id'));
             })
+            ->when($request->filled('brand_id'), function ($query) use ($request): void {
+                $query->where('brand_id', $request->integer('brand_id'));
+            })
             ->when($request->filled('featured'), function ($query) use ($request): void {
                 $query->where('featured', $request->boolean('featured'));
             })
@@ -42,6 +46,7 @@ class ProductController extends Controller
 
         return view('admin.products.index', [
             'products' => $products,
+            'brandOptions' => $this->brandOptions(),
             'categoryOptions' => $this->categoryOptions(),
         ]);
     }
@@ -55,6 +60,7 @@ class ProductController extends Controller
                 'status' => 'draft',
                 'featured' => false,
             ]),
+            'brandOptions' => $this->brandOptions(),
             'categoryOptions' => $this->categoryOptions(),
             'imagePaths' => '',
         ]);
@@ -74,7 +80,7 @@ class ProductController extends Controller
 
     public function show(Product $product): View
     {
-        $product->load('category', 'images');
+        $product->load('brand', 'category', 'images');
 
         return view('admin.products.show', compact('product'));
     }
@@ -85,6 +91,7 @@ class ProductController extends Controller
 
         return view('admin.products.edit', [
             'product' => $product,
+            'brandOptions' => $this->brandOptions(),
             'categoryOptions' => $this->categoryOptions(),
             'imagePaths' => $product->images->pluck('path')->implode(PHP_EOL),
         ]);
@@ -125,6 +132,7 @@ class ProductController extends Controller
 
         $validated = $request->validate([
             'category_id' => ['nullable', 'integer', Rule::exists('categories', 'id')],
+            'brand_id' => ['nullable', 'integer', Rule::exists('brands', 'id')],
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255', Rule::unique('products', 'slug')->ignore($product?->id)],
             'short_description' => ['nullable', 'string', 'max:1000'],
@@ -174,6 +182,18 @@ class ProductController extends Controller
     private function categoryOptions(): array
     {
         return Category::query()
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->pluck('name', 'id')
+            ->all();
+    }
+
+    /**
+     * @return array<int|string, string>
+     */
+    private function brandOptions(): array
+    {
+        return Brand::query()
             ->orderBy('sort_order')
             ->orderBy('name')
             ->pluck('name', 'id')

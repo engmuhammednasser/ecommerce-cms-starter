@@ -85,6 +85,12 @@
                 <span>{{ setting('cart.subtotal_label', 'Subtotal') }}</span>
                 <span>{{ number_format($cart['subtotal'], 2) }}</span>
             </div>
+            @if ($cart['coupon'])
+                <div class="mt-3 flex justify-between gap-4 text-sm text-emerald-700">
+                    <span>Coupon {{ $cart['coupon']['code'] }}</span>
+                    <span>-{{ number_format($cart['discount'], 2) }}</span>
+                </div>
+            @endif
             <div class="mt-3 flex justify-between gap-4 text-sm">
                 <span>{{ setting('shipping.label', 'Shipping') }}</span>
                 <span>{{ number_format($totals['shipping'], 2) }}</span>

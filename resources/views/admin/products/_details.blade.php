@@ -8,6 +8,9 @@
     <dt class="col-sm-3">Category</dt>
     <dd class="col-sm-9">{{ $product->category?->name ?: 'None' }}</dd>
 
+    <dt class="col-sm-3">Brand</dt>
+    <dd class="col-sm-9">{{ $product->brand?->name ?: 'None' }}</dd>
+
     <dt class="col-sm-3">SKU</dt>
     <dd class="col-sm-9">{{ $product->sku ?: 'Not set' }}</dd>
 
@@ -35,7 +38,7 @@
     <dt class="col-sm-3">Images</dt>
     <dd class="col-sm-9">
         @forelse ($product->images as $image)
-            <div>{{ $image->path }}</div>
+            <img src="{{ asset('storage/' . $image->path) }}" alt="{{ $image->alt_text ?: $product->name }}" class="img-thumbnail admin-media-picker-image me-2 mb-2">
         @empty
             Not set
         @endforelse
@@ -48,5 +51,11 @@
     <dd class="col-sm-9">{{ $product->seo_description ?: 'Not set' }}</dd>
 
     <dt class="col-sm-3">SEO Image</dt>
-    <dd class="col-sm-9">{{ $product->seo_image ?: 'Not set' }}</dd>
+    <dd class="col-sm-9">
+        @if ($product->seo_image)
+            <img src="{{ asset('storage/' . $product->seo_image) }}" alt="{{ $product->name }} SEO image" class="img-thumbnail admin-media-picker-image">
+        @else
+            Not set
+        @endif
+    </dd>
 </dl>

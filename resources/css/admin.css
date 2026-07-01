@@ -1,1 +1,62 @@
 @import 'admin-lte/dist/css/adminlte.css';
+
+.admin-sidebar-icon {
+    width: 1.25rem;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    margin-right: .5rem;
+}
+
+.sidebar-collapse .admin-sidebar-icon,
+.sidebar-mini.sidebar-collapse .admin-sidebar-icon {
+    margin-right: 0;
+}
+
+.admin-header-icon {
+    width: 1.35rem;
+    height: 1.35rem;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    vertical-align: middle;
+}
+
+.settings-nav {
+    top: 1rem;
+}
+
+.settings-nav .list-group-item {
+    border-radius: .5rem;
+    margin-bottom: .5rem;
+}
+
+.settings-section {
+    scroll-margin-top: 1rem;
+}
+
+.settings-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    margin-top: 1rem;
+    padding: 1rem 0;
+    background: var(--bs-body-bg);
+}
+
+.settings-toggle {
+    background: var(--bs-tertiary-bg);
+}
+
+.admin-media-picker-image {
+    width: 128px;
+    height: 128px;
+    object-fit: cover;
+}
+
+.admin-product-featured-image {
+    width: 160px;
+    height: 160px;
+    object-fit: cover;
+}

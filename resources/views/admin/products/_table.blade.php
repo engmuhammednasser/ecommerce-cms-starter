@@ -13,6 +13,7 @@
                     <th>Name</th>
                     <th>SKU</th>
                     <th>Category</th>
+                    <th>Brand</th>
                     <th>Price</th>
                     <th>Stock</th>
                     <th>Status</th>
@@ -26,6 +27,7 @@
                         <td>{{ $product->name }}</td>
                         <td>{{ $product->sku ?: 'Not set' }}</td>
                         <td>{{ $product->category?->name ?: 'None' }}</td>
+                        <td>{{ $product->brand?->name ?: 'None' }}</td>
                         <td>{{ number_format((float) $product->price, 2) }}</td>
                         <td>{{ $product->stock_quantity }}</td>
                         <td>

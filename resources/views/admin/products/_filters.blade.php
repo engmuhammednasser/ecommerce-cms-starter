@@ -7,13 +7,22 @@
                 'value' => request('search'),
             ])
         </div>
-        <div class="col-lg-3">
+        <div class="col-lg-2">
             @include('admin.components.form.select', [
                 'name' => 'category_id',
                 'label' => 'Category',
                 'selected' => request('category_id'),
                 'placeholder' => 'All categories',
                 'options' => $categoryOptions,
+            ])
+        </div>
+        <div class="col-lg-2">
+            @include('admin.components.form.select', [
+                'name' => 'brand_id',
+                'label' => 'Brand',
+                'selected' => request('brand_id'),
+                'placeholder' => 'All brands',
+                'options' => $brandOptions,
             ])
         </div>
         <div class="col-lg-2">
@@ -25,7 +34,7 @@
                 'options' => \App\Models\Product::STATUSES,
             ])
         </div>
-        <div class="col-lg-2">
+        <div class="col-lg-1">
             @include('admin.components.form.select', [
                 'name' => 'featured',
                 'label' => 'Featured',
