@@ -23,7 +23,7 @@ class MediaController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'file' => ['required', 'file', 'mimes:jpg,jpeg,png,webp,gif,pdf', 'max:10240'],
+            'file' => ['required', 'file', 'mimes:jpg,jpeg,png,webp,gif,svg,pdf', 'max:10240'],
             'alt_text' => ['nullable', 'string', 'max:255'],
         ]);
 

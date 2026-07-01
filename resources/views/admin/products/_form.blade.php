@@ -39,6 +39,12 @@
                 'value' => $imagePaths,
                 'rows' => 4,
             ])
+            <div class="mb-3 mt-n2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-media-picker-open data-media-picker-target="image_paths" data-media-picker-append>
+                    Choose from Media Library
+                </button>
+                <div class="form-text mt-1">Select multiple images to append them to the list above. The first image will be the featured image.</div>
+            </div>
         </div>
 
         <div class="col-lg-4">

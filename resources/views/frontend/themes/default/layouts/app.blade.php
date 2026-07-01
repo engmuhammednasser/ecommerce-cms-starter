@@ -5,6 +5,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
+        @if (setting('general.favicon'))
+            <link rel="icon" href="{{ asset('storage/' . setting('general.favicon')) }}">
+        @endif
+
         @php
             $seoTitle = $metaTitle ?? trim($__env->yieldContent('title', config('app.name', 'Laravel')));
             $seoDescription = $metaDescription ?? setting('seo.default_description');

@@ -37,6 +37,9 @@ document.addEventListener('click', (event) => {
 
     if (openButton) {
         mediaPickerTarget = document.getElementById(openButton.dataset.mediaPickerTarget);
+        if (mediaPickerTarget) {
+            mediaPickerTarget.dataset.mediaPickerAppendMode = openButton.hasAttribute('data-media-picker-append') ? 'true' : 'false';
+        }
         openMediaPickerModal();
     }
 
@@ -50,13 +53,22 @@ document.addEventListener('click', (event) => {
         return;
     }
 
-    mediaPickerTarget.value = selectButton.dataset.mediaPath || '';
+    const appendMode = mediaPickerTarget.dataset.mediaPickerAppendMode === 'true';
+    const newPath = selectButton.dataset.mediaPath || '';
+
+    if (appendMode) {
+        const currentValue = mediaPickerTarget.value.trim();
+        mediaPickerTarget.value = currentValue ? currentValue + '\n' + newPath : newPath;
+    } else {
+        mediaPickerTarget.value = newPath;
+    }
+    
     mediaPickerTarget.dispatchEvent(new Event('change', { bubbles: true }));
 
     const previewId = mediaPickerTarget.dataset.mediaPickerPreview;
     const preview = previewId ? document.getElementById(previewId) : null;
 
-    if (preview && selectButton.dataset.mediaUrl) {
+    if (preview && selectButton.dataset.mediaUrl && !appendMode) {
         preview.innerHTML = `<img src="${selectButton.dataset.mediaUrl}" alt="" class="img-thumbnail" style="width: 96px; height: 96px; object-fit: cover;">`;
     }
 

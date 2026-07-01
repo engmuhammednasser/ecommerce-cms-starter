@@ -10,7 +10,7 @@
                     type="file"
                     name="file"
                     class="form-control @error('file') is-invalid @enderror"
-                    accept=".jpg,.jpeg,.png,.webp,.gif,.pdf"
+                    accept=".jpg,.jpeg,.png,.webp,.gif,.svg,.pdf"
                     required
                 >
                 @error('file')

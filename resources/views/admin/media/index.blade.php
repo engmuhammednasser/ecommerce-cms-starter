@@ -13,7 +13,7 @@
 @section('content')
     @include('admin.components.card', [
         'title' => 'Upload Media',
-        'subtitle' => 'Allowed files: JPG, PNG, WebP, GIF, and PDF up to 10 MB.',
+        'subtitle' => 'Allowed files: JPG, PNG, WebP, GIF, SVG, and PDF up to 10 MB.',
         'slot' => view('admin.media._upload-form')->render(),
     ])
 
