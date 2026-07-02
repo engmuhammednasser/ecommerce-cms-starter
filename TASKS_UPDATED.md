@@ -1509,3 +1509,14 @@ Status: done
 Scope:
 - Audit source Laravel project structure, database, media, and mapping to the new CMS.
 - No data import yet.
+
+### TASK-P002: Build Awalad Farouk safe catalog/media import command
+Status: done
+
+Scope:
+- Created an idempotent Artisan command `php artisan import:awalad`.
+- Supports `--dry-run` and `--only=` flags.
+- Maps `product_categories` to `Category`.
+- Maps `products` to `Product`, linking variations to `ProductVariant`.
+- Maps physical files from old `public/imported/products` to `storage/app/public/imported/awalad`.
+- Safely updates or creates `Media` records and assigns them to `main_image_id`, `hover_image_id`, and `seo_image_id`.
