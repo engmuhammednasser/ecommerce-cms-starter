@@ -18,6 +18,70 @@
 
 ---
 
+## How To Clone The Empty Dashboard
+
+> Use this when you want a **clean, empty CMS starter kit** with no imported catalog data.
+
+Clone from the stable tag `v1.0-starter-stable` (recommended) or from `main`:
+
+```powershell
+cd C:\xampp\htdocs
+git clone --branch v1.0-starter-stable https://github.com/engmuhammednasser/ecommerce-cms-starter.git dashboard-empty
+cd dashboard-empty
+composer install
+npm install && npm run build
+copy .env.example .env
+php artisan key:generate
+php artisan storage:link
+php artisan migrate
+```
+
+After migration, optionally seed demo data:
+
+```powershell
+php artisan db:seed
+```
+
+Then open `http://localhost/dashboard-empty/public` or run:
+
+```powershell
+php artisan serve
+```
+
+> ⚠️ Do **not** clone from `product-store` if you want the empty dashboard.  
+> `product-store` contains Awalad Farouk-specific Arabic UI, imported catalog commands, and RTL layout changes that are not part of the generic starter kit.
+
+---
+
+## How To Clone The Awalad Farouk Store Branch
+
+> Use this when you want to continue working on the **real Awalad Farouk store customization**.
+
+```powershell
+cd C:\xampp\htdocs
+git clone --branch product-store https://github.com/engmuhammednasser/ecommerce-cms-starter.git awalad-store
+cd awalad-store
+composer install
+npm install && npm run build
+copy .env.example .env
+php artisan key:generate
+php artisan storage:link
+php artisan migrate
+```
+
+After migration, you will need to re-import the Awalad Farouk catalog data from the source project at `C:\xampp\htdocs\awalad-farouk` (the database and media are **not committed** to Git):
+
+```powershell
+php artisan import:awalad --dry-run --only=categories,products,media
+php artisan import:awalad --only=categories,products,media
+php artisan catalog:clean-awalad
+```
+
+> ⚠️ The SQLite database and imported media files are **local runtime data**.  
+> They are excluded by `.gitignore` and must be re-imported after a fresh clone.
+
+---
+
 ## Stable Baseline
 
 The starter-kit baseline was completed and saved as:
