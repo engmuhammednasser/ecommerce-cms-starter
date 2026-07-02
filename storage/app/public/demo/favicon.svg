@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="Demo store favicon">
+  <rect width="128" height="128" rx="24" fill="#111827"/>
+  <path d="M32 56h64l-8 44H40z" fill="#f9fafb"/>
+  <path d="M43 48c0-17 10-30 25-30s25 13 25 30" fill="none" stroke="#60a5fa" stroke-width="10" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800" role="img" aria-label="Demo lamp product">
+  <rect width="800" height="800" fill="#fffbeb"/>
+  <path d="M302 184h196l76 222H226z" fill="#f59e0b"/>
+  <rect x="374" y="406" width="52" height="202" fill="#92400e"/>
+  <rect x="286" y="608" width="228" height="52" rx="26" fill="#78350f"/>
+  <circle cx="400" cy="430" r="46" fill="#fde68a"/>
+</svg>
