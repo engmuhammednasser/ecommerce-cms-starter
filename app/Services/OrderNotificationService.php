@@ -40,7 +40,7 @@ class OrderNotificationService
         }
 
         try {
-            Mail::send('emails.template', ['body' => $message['body']], function ($mail) use ($order, $message): void {
+            Mail::queue('emails.template', ['body' => $message['body']], function ($mail) use ($order, $message): void {
                 $mail->to($order->customer_email, $order->customer_name)
                     ->subject($message['subject']);
             });

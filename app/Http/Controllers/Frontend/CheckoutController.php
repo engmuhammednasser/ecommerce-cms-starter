@@ -12,10 +12,15 @@ use App\Services\CouponDiscountService;
 use App\Services\OrderNotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use App\Services\Contracts\PaymentGatewayInterface;
+use App\Services\InventoryService;
+use App\Models\ShippingZone;
+use App\Models\ShippingRate;
 
 class CheckoutController extends Controller
 {
@@ -27,21 +32,38 @@ class CheckoutController extends Controller
             return redirect()->route('cart.show');
         }
 
+        $customer = Auth::guard('customer')->user();
+        $defaultAddress = $customer?->addresses()->where('is_default', true)->first() 
+            ?? $customer?->addresses()->first();
+
         return view('frontend.themes.default.checkout', $this->themeData([
             'title' => setting('checkout.title', 'Checkout'),
             'metaTitle' => setting('checkout.title', setting('general.site_name', config('app.name', 'Laravel'))),
             'cart' => $cart,
             'totals' => $this->checkoutTotals($cart['subtotal'], $cart['discount']),
             'cashOnDeliveryEnabled' => $this->cashOnDeliveryEnabled(),
+            'dummyGatewayEnabled' => setting('payment.dummy_gateway_enabled', '0') === '1',
+            'shippingZones' => ShippingZone::with(['rates' => fn($q) => $q->where('is_active', true)])
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->get(),
+            'customer' => $customer,
+            'defaultAddress' => $defaultAddress,
         ]));
     }
 
-    public function store(Request $request, OrderNotificationService $notifications): RedirectResponse
+    public function store(Request $request, OrderNotificationService $notifications, PaymentGatewayInterface $paymentGateway, InventoryService $inventory)
     {
         $cart = $this->cartSummary($request);
 
         if ($cart['items']->isEmpty()) {
             return redirect()->route('cart.show');
+        }
+
+        $stockCheck = $inventory->checkStock($cart['items']);
+        if (! $stockCheck['sufficient']) {
+            $names = collect($stockCheck['insufficient'])->map(fn ($i) => $i['name'] . ' (available: ' . $i['available'] . ')')->implode(', ');
+            return redirect()->route('checkout.create')->with('error', 'Insufficient stock for: ' . $names);
         }
 
         $validated = $request->validate([
@@ -50,20 +72,31 @@ class CheckoutController extends Controller
             'customer_phone' => ['nullable', 'string', 'max:255'],
             'customer_address' => ['required', 'string', 'max:1000'],
             'notes' => ['nullable', 'string', 'max:1000'],
-            'payment_method' => ['required', 'string', 'in:cash_on_delivery'],
+            'payment_method' => ['required', 'string', 'in:cash_on_delivery,dummy_gateway'],
+            'shipping_rate_id' => ['required', 'exists:shipping_rates,id'],
         ]);
 
-        abort_unless($this->cashOnDeliveryEnabled(), 422);
+        if ($validated['payment_method'] === 'cash_on_delivery') {
+            abort_unless($this->cashOnDeliveryEnabled(), 422);
+        } elseif ($validated['payment_method'] === 'dummy_gateway') {
+            abort_unless($paymentGateway->isEnabled(), 422);
+        }
 
-        $totals = $this->checkoutTotals($cart['subtotal'], $cart['discount']);
+        $shippingRate = ShippingRate::with('zone')->where('is_active', true)->findOrFail($validated['shipping_rate_id']);
+
+        $totals = $this->checkoutTotals($cart['subtotal'], $cart['discount'], $shippingRate);
 
         $order = DB::transaction(function () use ($validated, $cart, $totals): Order {
-            $customer = Customer::create([
-                'name' => $validated['customer_name'],
-                'email' => $validated['customer_email'] ?? null,
-                'phone' => $validated['customer_phone'] ?? null,
-                'status' => 'guest',
-            ]);
+            $customer = Auth::guard('customer')->user();
+
+            if (! $customer) {
+                $customer = Customer::create([
+                    'name' => $validated['customer_name'],
+                    'email' => $validated['customer_email'] ?? null,
+                    'phone' => $validated['customer_phone'] ?? null,
+                    'status' => 'guest',
+                ]);
+            }
 
             $order = Order::create([
                 'customer_id' => $customer->id,
@@ -74,7 +107,10 @@ class CheckoutController extends Controller
                 'customer_address' => $validated['customer_address'],
                 'notes' => $validated['notes'] ?? null,
                 'status' => 'pending',
+                'payment_status' => 'unpaid',
                 'payment_method' => $validated['payment_method'],
+                'shipping_zone' => $shippingRate->zone->name,
+                'shipping_rate_name' => $shippingRate->name,
                 'coupon_code' => $cart['coupon']['code'] ?? null,
                 'coupon_name' => $cart['coupon']['name'] ?? null,
                 'discount_amount' => $cart['discount'],
@@ -89,8 +125,10 @@ class CheckoutController extends Controller
 
                 $order->items()->create([
                     'product_id' => $product->id,
+                    'variant_id' => $line['variant']?->id,
                     'product_name' => $product->name,
-                    'product_sku' => $product->sku,
+                    'product_sku' => $line['variant']?->sku ?: $product->sku,
+                    'variant_label' => $line['variant_label'],
                     'quantity' => $line['quantity'],
                     'unit_price' => $line['unit_price'],
                     'line_total' => $line['line_total'],
@@ -107,9 +145,15 @@ class CheckoutController extends Controller
             return $order;
         });
 
+        $inventory->decreaseStockForOrder($order);
+
         $request->session()->forget('cart.items');
         $request->session()->forget('cart.coupon_code');
         $notifications->orderPlaced($order);
+
+        if ($order->payment_method !== 'cash_on_delivery' && $paymentGateway->isEnabled()) {
+            return redirect()->away($paymentGateway->initiatePayment($order));
+        }
 
         return redirect()->route('checkout.success', $order);
     }
@@ -131,7 +175,7 @@ class CheckoutController extends Controller
     private function cartItems(Request $request): array
     {
         return collect($request->session()->get('cart.items', []))
-            ->mapWithKeys(fn ($quantity, $productId): array => [(string) $productId => max(1, (int) $quantity)])
+            ->mapWithKeys(fn ($quantity, $key): array => [(string) $key => max(1, (int) $quantity)])
             ->all();
     }
 
@@ -141,24 +185,42 @@ class CheckoutController extends Controller
     private function cartSummary(Request $request): array
     {
         $items = $this->cartItems($request);
+        $productIds = collect(array_keys($items))->map(fn ($k) => explode('_', $k)[0])->unique()->all();
+
         $products = Product::query()
+            ->with('primaryImage', 'variants.attributeValues.attribute')
             ->where('status', 'published')
-            ->whereIn('id', array_keys($items))
+            ->whereIn('id', $productIds)
             ->get()
             ->keyBy('id');
 
         $lines = collect($items)
-            ->map(function (int $quantity, string $productId) use ($products): ?array {
-                $product = $products->get((int) $productId);
+            ->map(function (int $quantity, string $cartKey) use ($products): ?array {
+                $parts = explode('_', $cartKey);
+                $productId = (int) $parts[0];
+                $variantId = isset($parts[1]) ? (int) $parts[1] : null;
+
+                $product = $products->get($productId);
 
                 if (! $product) {
                     return null;
                 }
 
-                $unitPrice = (float) ($product->sale_price ?: $product->price);
+                $variant = null;
+                $label = null;
+                if ($variantId) {
+                    $variant = $product->variants->firstWhere('id', $variantId);
+                    if (!$variant || $variant->status !== 'active') return null;
+                    $label = $variant->label();
+                }
+
+                $unitPrice = $variant ? $variant->effectivePrice($product) : (float) ($product->sale_price ?: $product->price);
 
                 return [
+                    'cart_key' => $cartKey,
                     'product' => $product,
+                    'variant' => $variant,
+                    'variant_label' => $label,
                     'quantity' => $quantity,
                     'unit_price' => $unitPrice,
                     'line_total' => $unitPrice * $quantity,
@@ -207,11 +269,18 @@ class CheckoutController extends Controller
     /**
      * @return array{shipping: float, tax: float, total: float}
      */
-    private function checkoutTotals(float $subtotal, float $discount = 0.0): array
+    private function checkoutTotals(float $subtotal, float $discount = 0.0, ?ShippingRate $shippingRate = null): array
     {
         $discountedSubtotal = max(0, $subtotal - $discount);
-        $flatRate = max(0, (float) setting('shipping.flat_rate', 0));
-        $freeThreshold = setting('shipping.free_shipping_threshold');
+        
+        if ($shippingRate) {
+            $flatRate = max(0, (float) $shippingRate->rate);
+            $freeThreshold = $shippingRate->free_shipping_threshold;
+        } else {
+            $flatRate = max(0, (float) setting('shipping.flat_rate', 0));
+            $freeThreshold = setting('shipping.free_shipping_threshold');
+        }
+
         $freeThreshold = $freeThreshold === null || $freeThreshold === '' ? null : max(0, (float) $freeThreshold);
         $shipping = $freeThreshold !== null && $discountedSubtotal >= $freeThreshold ? 0.0 : $flatRate;
         $taxRate = max(0, (float) setting('tax.percentage', 0));

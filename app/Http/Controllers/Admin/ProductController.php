@@ -87,7 +87,7 @@ class ProductController extends Controller
 
     public function edit(Product $product): View
     {
-        $product->load('images');
+        $product->load('images', 'variants.attributeValues.attribute');
 
         return view('admin.products.edit', [
             'product' => $product,

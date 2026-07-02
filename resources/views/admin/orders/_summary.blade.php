@@ -16,8 +16,11 @@
         <dd class="col-sm-6 text-sm-end">-{{ number_format((float) $order->discount_amount, 2) }}</dd>
     @endif
 
-    <dt class="col-sm-6">Payment</dt>
+    <dt class="col-sm-6">Payment Method</dt>
     <dd class="col-sm-6 text-sm-end">{{ $order->payment_method === 'cash_on_delivery' ? 'Cash on delivery' : 'Not set' }}</dd>
+
+    <dt class="col-sm-6">Payment Status</dt>
+    <dd class="col-sm-6 text-sm-end">@include('admin.components.status-badge', ['status' => $order->payment_status])</dd>
 
     <dt class="col-sm-6">Total</dt>
     <dd class="col-sm-6 text-sm-end fw-semibold">{{ number_format((float) $order->total, 2) }}</dd>

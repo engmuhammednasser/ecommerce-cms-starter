@@ -12,6 +12,12 @@
 @endphp
 
 @section('content')
+    <div class="mb-4">
+        <a href="{{ route('admin.orders.invoice', $order) }}" target="_blank" class="btn btn-secondary">
+            <i class="fas fa-print mr-1"></i> Print Invoice
+        </a>
+    </div>
+
     <div class="row">
         <div class="col-lg-8">
             @include('admin.components.card', [

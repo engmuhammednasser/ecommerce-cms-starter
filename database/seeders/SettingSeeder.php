@@ -40,9 +40,12 @@ class SettingSeeder extends Seeder
         ['group' => 'analytics', 'key' => 'google_analytics_id', 'value' => null, 'type' => 'text'],
         ['group' => 'analytics', 'key' => 'facebook_pixel_id', 'value' => null, 'type' => 'text'],
         ['group' => 'payment', 'key' => 'cash_on_delivery_enabled', 'value' => '1', 'type' => 'boolean'],
+        ['group' => 'payment', 'key' => 'dummy_gateway_enabled', 'value' => '0', 'type' => 'boolean'],
+        ['group' => 'payment', 'key' => 'dummy_gateway_api_key', 'value' => null, 'type' => 'text'],
         ['group' => 'shipping', 'key' => 'flat_rate', 'value' => '0', 'type' => 'number'],
         ['group' => 'shipping', 'key' => 'free_shipping_threshold', 'value' => null, 'type' => 'number'],
         ['group' => 'tax', 'key' => 'percentage', 'value' => '0', 'type' => 'number'],
+        ['group' => 'inventory', 'key' => 'low_stock_threshold', 'value' => '5', 'type' => 'number'],
     ];
 
     public function run(): void

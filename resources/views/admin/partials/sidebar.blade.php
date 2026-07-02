@@ -79,7 +79,7 @@
                     <a href="{{ route('admin.attributes.index') }}" class="nav-link{{ $active('admin.attributes.*') }}">{!! $navIcon('attribute') !!}<p>Attributes</p></a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">{!! $navIcon('inventory') !!}<p>Inventory</p></a>
+                    <a href="{{ route('admin.inventory.index') }}" class="nav-link{{ $active('admin.inventory.*') }}">{!! $navIcon('inventory') !!}<p>Inventory</p></a>
                 </li>
 
                 <li class="nav-header">Sales</li>
@@ -115,7 +115,7 @@
                     <a href="#" class="nav-link">{!! $navIcon('seo') !!}<p>SEO Settings</p></a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('admin.settings.index') }}#shipping-settings" class="nav-link">{!! $navIcon('shipping') !!}<p>Shipping Settings</p></a>
+                    <a href="{{ route('admin.shipping-zones.index') }}" class="nav-link{{ $active('admin.shipping-zones.*') }}">{!! $navIcon('shipping') !!}<p>Shipping Zones</p></a>
                 </li>
                 <li class="nav-item">
                     <a href="{{ route('admin.settings.index') }}#payment-settings" class="nav-link">{!! $navIcon('payment') !!}<p>Payment Settings</p></a>

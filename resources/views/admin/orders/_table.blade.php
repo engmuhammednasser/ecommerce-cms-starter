@@ -13,6 +13,8 @@
                     <th>Items</th>
                     <th>Total</th>
                     <th>Status</th>
+                    <th>Payment</th>
+                    <th>Fulfillment</th>
                     <th>Created</th>
                     <th class="text-end">Actions</th>
                 </tr>
@@ -28,6 +30,8 @@
                         <td>{{ $order->items_count }}</td>
                         <td>{{ number_format((float) $order->total, 2) }}</td>
                         <td>@include('admin.components.status-badge', ['status' => $order->status])</td>
+                        <td>@include('admin.components.status-badge', ['status' => $order->payment_status])</td>
+                        <td>@include('admin.components.status-badge', ['status' => $order->fulfillment_status ?? 'unfulfilled'])</td>
                         <td>{{ $order->created_at?->format('Y-m-d H:i') }}</td>
                         <td class="text-end">
                             <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-outline-secondary">View</a>

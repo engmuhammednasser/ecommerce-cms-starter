@@ -18,16 +18,20 @@
         @endif
 
         @if ($cart['items']->isEmpty())
-            <div class="rounded-3xl border border-slate-200 bg-white p-10 text-center text-slate-600 shadow-sm">
-                {{ setting('cart.empty_message', 'Your cart is empty.') }}
-            </div>
+            @include('frontend.themes.default.components.empty-state', [
+                'title' => 'Your cart is empty',
+                'message' => setting('cart.empty_message', 'You have no items in your shopping cart.'),
+                'actionText' => 'Continue Shopping',
+                'actionUrl' => route('catalog.shop')
+            ])
         @else
             <div class="grid gap-8 lg:grid-cols-[1fr_20rem]">
                 <div class="space-y-4">
                     @foreach ($cart['items'] as $line)
                         @php
                             $product = $line['product'];
-                            $image = $product->primaryImage?->path;
+                            $variant = $line['variant'];
+                            $image = $variant?->image ?: $product->primaryImage?->path;
                         @endphp
 
                         <div class="grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-[7rem_1fr_auto]">
@@ -43,9 +47,12 @@
                                         {{ $product->name }}
                                     </a>
                                 </h2>
+                                @if ($line['variant_label'])
+                                    <div class="text-xs text-slate-500">{{ $line['variant_label'] }}</div>
+                                @endif
                                 <div class="text-sm text-slate-600">{{ number_format($line['unit_price'], 2) }}</div>
 
-                                <form method="POST" action="{{ route('cart.items.update', $product) }}" class="flex max-w-xs items-end gap-3">
+                                <form method="POST" action="{{ route('cart.items.update', $line['cart_key']) }}" class="flex max-w-xs items-end gap-3">
                                     @csrf
                                     @method('PATCH')
                                     <label class="block text-sm">
@@ -60,7 +67,7 @@
 
                             <div class="flex flex-col items-start justify-between gap-4 sm:items-end">
                                 <div class="font-semibold">{{ number_format($line['line_total'], 2) }}</div>
-                                <form method="POST" action="{{ route('cart.items.destroy', $product) }}">
+                                <form method="POST" action="{{ route('cart.items.destroy', $line['cart_key']) }}">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-sm font-semibold text-slate-500 underline hover:text-slate-950">

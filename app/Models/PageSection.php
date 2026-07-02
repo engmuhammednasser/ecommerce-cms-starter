@@ -28,7 +28,6 @@ class PageSection extends Model
         'categories_grid' => 'Categories Grid',
         'text_image' => 'Text Image',
         'testimonials' => 'Testimonials',
-        'faq' => 'FAQ',
         'cta' => 'Call To Action',
         'newsletter' => 'Newsletter',
     ];

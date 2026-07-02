@@ -74,4 +74,20 @@ class Product extends Model
     {
         return $this->hasOne(ProductImage::class)->where('is_primary', true);
     }
+
+    /**
+     * @return HasMany<ProductVariant, $this>
+     */
+    public function variants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class)->orderBy('sort_order');
+    }
+
+    /**
+     * Whether this product has any active variants.
+     */
+    public function hasVariants(): bool
+    {
+        return $this->variants()->where('status', 'active')->exists();
+    }
 }

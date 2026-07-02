@@ -22,7 +22,8 @@
                             ])
                         </td>
                         <td class="text-end">
-                            <a href="{{ route('admin.email-templates.show', $template) }}" class="btn btn-sm btn-outline-primary">View</a>
+                            <a href="{{ route('admin.email-templates.show', $template) }}" class="btn btn-sm btn-outline-secondary">View</a>
+                            <a href="{{ route('admin.email-templates.edit', $template) }}" class="btn btn-sm btn-outline-primary">Edit</a>
                         </td>
                     </tr>
                 @endforeach

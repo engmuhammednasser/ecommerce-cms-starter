@@ -17,7 +17,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'notes',
     'admin_notes',
     'status',
+    'payment_status',
+    'fulfillment_status',
     'payment_method',
+    'shipping_zone',
+    'shipping_rate_name',
     'coupon_code',
     'coupon_name',
     'discount_amount',
@@ -34,6 +38,19 @@ class Order extends Model
         'completed' => 'Completed',
         'cancelled' => 'Cancelled',
         'refunded' => 'Refunded',
+    ];
+
+    public const PAYMENT_STATUSES = [
+        'unpaid' => 'Unpaid',
+        'paid' => 'Paid',
+        'failed' => 'Failed',
+        'refunded' => 'Refunded',
+    ];
+
+    public const FULFILLMENT_STATUSES = [
+        'unfulfilled' => 'Unfulfilled',
+        'partially_fulfilled' => 'Partially Fulfilled',
+        'fulfilled' => 'Fulfilled',
     ];
 
     protected function casts(): array
@@ -61,5 +78,13 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * @return HasMany<OrderHistory, $this>
+     */
+    public function histories(): HasMany
+    {
+        return $this->hasMany(OrderHistory::class);
     }
 }

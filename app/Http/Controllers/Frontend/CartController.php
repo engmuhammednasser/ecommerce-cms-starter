@@ -28,11 +28,24 @@ class CartController extends Controller
 
         $validated = $request->validate([
             'quantity' => ['required', 'integer', 'min:1', 'max:999'],
+            'variant_id' => ['nullable', 'integer'],
         ]);
 
+        if ($product->hasVariants() && empty($validated['variant_id'])) {
+            return back()->with('error', 'Please select a product option.');
+        }
+
+        if (!empty($validated['variant_id'])) {
+            $variant = $product->variants()->where('id', $validated['variant_id'])->where('status', 'active')->firstOrFail();
+        }
+
         $items = $this->cartItems($request);
-        $productId = (string) $product->id;
-        $items[$productId] = ($items[$productId] ?? 0) + (int) $validated['quantity'];
+        $cartKey = (string) $product->id;
+        if (!empty($validated['variant_id'])) {
+            $cartKey .= '_' . $validated['variant_id'];
+        }
+
+        $items[$cartKey] = ($items[$cartKey] ?? 0) + (int) $validated['quantity'];
 
         $request->session()->put('cart.items', $items);
 
@@ -41,17 +54,16 @@ class CartController extends Controller
             ->with('success', 'Product added to cart.');
     }
 
-    public function update(Request $request, Product $product): RedirectResponse
+    public function update(Request $request, string $cartKey): RedirectResponse
     {
         $validated = $request->validate([
             'quantity' => ['required', 'integer', 'min:1', 'max:999'],
         ]);
 
         $items = $this->cartItems($request);
-        $productId = (string) $product->id;
 
-        if (array_key_exists($productId, $items)) {
-            $items[$productId] = (int) $validated['quantity'];
+        if (array_key_exists($cartKey, $items)) {
+            $items[$cartKey] = (int) $validated['quantity'];
             $request->session()->put('cart.items', $items);
         }
 
@@ -60,10 +72,10 @@ class CartController extends Controller
             ->with('success', 'Cart updated.');
     }
 
-    public function destroy(Request $request, Product $product): RedirectResponse
+    public function destroy(Request $request, string $cartKey): RedirectResponse
     {
         $items = $this->cartItems($request);
-        unset($items[(string) $product->id]);
+        unset($items[$cartKey]);
 
         $request->session()->put('cart.items', $items);
 
@@ -109,7 +121,7 @@ class CartController extends Controller
     private function cartItems(Request $request): array
     {
         return collect($request->session()->get('cart.items', []))
-            ->mapWithKeys(fn ($quantity, $productId): array => [(string) $productId => max(1, (int) $quantity)])
+            ->mapWithKeys(fn ($quantity, $key): array => [(string) $key => max(1, (int) $quantity)])
             ->all();
     }
 
@@ -119,25 +131,42 @@ class CartController extends Controller
     private function cartSummary(Request $request): array
     {
         $items = $this->cartItems($request);
+        $productIds = collect(array_keys($items))->map(fn ($k) => explode('_', $k)[0])->unique()->all();
+
         $products = Product::query()
-            ->with('primaryImage')
+            ->with('primaryImage', 'variants.attributeValues.attribute')
             ->where('status', 'published')
-            ->whereIn('id', array_keys($items))
+            ->whereIn('id', $productIds)
             ->get()
             ->keyBy('id');
 
         $lines = collect($items)
-            ->map(function (int $quantity, string $productId) use ($products): ?array {
-                $product = $products->get((int) $productId);
+            ->map(function (int $quantity, string $cartKey) use ($products): ?array {
+                $parts = explode('_', $cartKey);
+                $productId = (int) $parts[0];
+                $variantId = isset($parts[1]) ? (int) $parts[1] : null;
+
+                $product = $products->get($productId);
 
                 if (! $product) {
                     return null;
                 }
 
-                $unitPrice = (float) ($product->sale_price ?: $product->price);
+                $variant = null;
+                $label = null;
+                if ($variantId) {
+                    $variant = $product->variants->firstWhere('id', $variantId);
+                    if (!$variant || $variant->status !== 'active') return null;
+                    $label = $variant->label();
+                }
+
+                $unitPrice = $variant ? $variant->effectivePrice($product) : (float) ($product->sale_price ?: $product->price);
 
                 return [
+                    'cart_key' => $cartKey,
                     'product' => $product,
+                    'variant' => $variant,
+                    'variant_label' => $label,
                     'quantity' => $quantity,
                     'unit_price' => $unitPrice,
                     'line_total' => $unitPrice * $quantity,

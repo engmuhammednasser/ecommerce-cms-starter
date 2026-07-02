@@ -19,6 +19,16 @@
                 'items' => $headerMenuItems ?? collect(),
             ])
 
+            @auth('customer')
+                <a href="{{ route('customer.dashboard') }}" class="text-sm font-semibold text-slate-700 transition hover:text-slate-950">
+                    My Account
+                </a>
+            @else
+                <a href="{{ route('customer.login') }}" class="text-sm font-semibold text-slate-700 transition hover:text-slate-950">
+                    Sign in
+                </a>
+            @endauth
+
             @if (setting('header.show_cart_link', '1') === '1')
                 <a href="{{ route('cart.show') }}" class="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-950 hover:bg-slate-950 hover:text-white">
                     {{ setting('header.cart_label', setting('cart.title', 'Cart')) }}

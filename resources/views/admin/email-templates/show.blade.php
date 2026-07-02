@@ -12,6 +12,12 @@
 @endphp
 
 @section('content')
+    <div class="mb-4">
+        <a href="{{ route('admin.email-templates.edit', $emailTemplate) }}" class="btn btn-primary">
+            <i class="fas fa-edit mr-1"></i> Edit Template
+        </a>
+    </div>
+
     @include('admin.components.card', [
         'title' => $emailTemplate->name,
         'subtitle' => 'Template key: ' . $emailTemplate->key,
