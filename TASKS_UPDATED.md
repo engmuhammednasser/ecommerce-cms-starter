@@ -1502,3 +1502,10 @@ Scope:
 - Updated hero.blade.php: desktopImage → mobileImage → legacy image → default_hero_image; respects image_alt, image_position, overlay_style.
 - Updated banner.blade.php: backgroundImage → desktopImage → legacy image; respects image_alt, image_position, overlay_style.
 - Updated product-details.blade.php: mainImage (Media) shown first, then gallery images (legacy ProductImage), then hoverImage if no gallery, then neutral fallback.
+
+### TASK-P001: Audit existing Awalad Farouk store for import
+Status: done
+
+Scope:
+- Audit source Laravel project structure, database, media, and mapping to the new CMS.
+- No data import yet.
