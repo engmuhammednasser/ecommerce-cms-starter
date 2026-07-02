@@ -2,6 +2,8 @@
 
 This file is the Codex execution plan for the Laravel E-commerce CMS Starter Kit.
 
+> **Note**: Stable baseline saved before product-store customization. (v1.0-starter-stable)
+
 ## How To Use This File
 
 Work on one task only at a time.
