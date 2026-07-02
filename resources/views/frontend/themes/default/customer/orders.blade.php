@@ -31,7 +31,7 @@
                                         </div>
                                         <div>
                                             <div class="text-xs font-semibold uppercase text-slate-500">Total</div>
-                                            <div class="text-sm font-medium text-slate-900">${{ number_format($order->total, 2) }}</div>
+                                            <div class="text-sm font-medium text-slate-900">{{ number_format($order->total, 2) }} ج.م</div>
                                         </div>
                                         <div>
                                             <div class="text-xs font-semibold uppercase text-slate-500">Status</div>
@@ -56,9 +56,9 @@
                                                 @if ($item->variant_label)
                                                     <div class="text-sm text-slate-500">{{ $item->variant_label }}</div>
                                                 @endif
-                                                <div class="text-sm text-slate-600">Qty: {{ $item->quantity }} x ${{ number_format($item->unit_price, 2) }}</div>
+                                                <div class="text-sm text-slate-600">{{ $item->quantity }} x {{ number_format($item->unit_price, 2) }} ج.م</div>
                                             </div>
-                                            <div class="font-semibold text-slate-900">${{ number_format($item->line_total, 2) }}</div>
+                                            <div class="font-semibold text-slate-900">{{ number_format($item->line_total, 2) }} ج.م</div>
                                         </div>
                                     @endforeach
                                 </div>

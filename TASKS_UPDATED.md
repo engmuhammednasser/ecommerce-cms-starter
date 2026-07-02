@@ -1520,3 +1520,39 @@ Scope:
 - Maps `products` to `Product`, linking variations to `ProductVariant`.
 - Maps physical files from old `public/imported/products` to `storage/app/public/imported/awalad`.
 - Safely updates or creates `Media` records and assigns them to `main_image_id`, `hover_image_id`, and `seo_image_id`.
+
+### TASK-052: Real store customization/implementation
+Status: done
+
+Scope:
+- Redesigned shop page with top-level category navigation.
+- Redesigned category pages with hero image and subcategory navigation.
+- Added clear filters / back to shop actions for empty states.
+
+### TASK-P004: Arabic UI, RTL direction, Cairo font, and product card image display
+Status: done
+
+Scope:
+- Arabic fixed UI labels for storefront/admin (header, filters, sort, badges, sidebar).
+- RTL page direction on frontend and admin layouts.
+- Cairo font loaded from Google Fonts globally.
+- Product card image rendering: object-contain, fallback chain, onerror handler.
+- Currency symbol (ج.م) added to price component via `store.currency_symbol` setting.
+- Full Arabic dashboard labels deferred to a follow-up task.
+- Cart/checkout/order-success currency labels partially done — needs final pass.
+
+### HANDOFF: Project handoff documentation created
+Status: done
+
+File: `docs/PROJECT_HANDOFF.md`
+
+Covers:
+- Branch structure and stable baseline.
+- Completed starter-kit features.
+- Awalad Farouk import details.
+- Arabic/RTL/Cairo font work summary.
+- Product card image status.
+- Do-not-commit list.
+- Recommended next steps.
+- Useful commands.
+- Last known warnings.

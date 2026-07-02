@@ -21,11 +21,11 @@
 
             @auth('customer')
                 <a href="{{ route('customer.dashboard') }}" class="text-sm font-semibold text-slate-700 transition hover:text-slate-950">
-                    My Account
+                    {{ __('store.my_account') }}
                 </a>
             @else
                 <a href="{{ route('customer.login') }}" class="text-sm font-semibold text-slate-700 transition hover:text-slate-950">
-                    Sign in
+                    {{ __('store.sign_in') }}
                 </a>
             @endauth
 

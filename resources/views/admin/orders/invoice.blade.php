@@ -92,9 +92,9 @@
                             @endif
                             <br><span style="color: #9ca3af; font-size: 0.75rem;">SKU: {{ $item->product_sku }}</span>
                         </td>
-                        <td class="text-right">${{ number_format($item->unit_price, 2) }}</td>
+                        <td class="text-right">{{ number_format($item->unit_price, 2) }} ج.م</td>
                         <td class="text-right">{{ $item->quantity }}</td>
-                        <td class="text-right">${{ number_format($item->line_total, 2) }}</td>
+                        <td class="text-right">{{ number_format($item->line_total, 2) }} ج.م</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -104,25 +104,25 @@
             <table class="totals-table">
                 <tr>
                     <th>Subtotal</th>
-                    <td>${{ number_format($order->subtotal, 2) }}</td>
+                    <td>{{ number_format($order->subtotal, 2) }} ج.م</td>
                 </tr>
                 @if ($order->discount_amount > 0)
                     <tr>
                         <th>Discount ({{ $order->coupon_code }})</th>
-                        <td>-${{ number_format($order->discount_amount, 2) }}</td>
+                        <td>-{{ number_format($order->discount_amount, 2) }} ج.م</td>
                     </tr>
                 @endif
                 <tr>
                     <th>Shipping</th>
-                    <td>${{ number_format($order->shipping_amount, 2) }}</td>
+                    <td>{{ number_format($order->shipping_amount, 2) }} ج.م</td>
                 </tr>
                 <tr>
                     <th>Tax</th>
-                    <td>${{ number_format($order->tax_amount, 2) }}</td>
+                    <td>{{ number_format($order->tax_amount, 2) }} ج.م</td>
                 </tr>
                 <tr class="grand-total">
                     <th>Total</th>
-                    <td>${{ number_format($order->total, 2) }}</td>
+                    <td>{{ number_format($order->total, 2) }} ج.م</td>
                 </tr>
             </table>
         </div>

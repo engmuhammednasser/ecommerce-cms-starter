@@ -47,7 +47,7 @@
                 <li class="nav-item">
                     <a href="{{ route('admin.dashboard') }}" class="nav-link{{ $active('admin.dashboard') }}">
                         {!! $navIcon('dashboard') !!}
-                        <p>Dashboard</p>
+                        <p>{{ __('admin.dashboard') }}</p>
                     </a>
                 </li>
 
@@ -62,15 +62,15 @@
                     <a href="{{ route('admin.menus.index') }}" class="nav-link{{ $active('admin.menus.*') }}">{!! $navIcon('menu') !!}<p>Menus</p></a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('admin.media.index') }}" class="nav-link{{ $active('admin.media.*') }}">{!! $navIcon('media') !!}<p>Media Library</p></a>
+                    <a href="{{ route('admin.media.index') }}" class="nav-link{{ $active('admin.media.*') }}">{!! $navIcon('media') !!}<p>{{ __('admin.media') }}</p></a>
                 </li>
 
-                <li class="nav-header">Catalog</li>
+                <li class="nav-header">{{ __('admin.catalog') }}</li>
                 <li class="nav-item">
-                    <a href="{{ route('admin.products.index') }}" class="nav-link{{ $active('admin.products.*') }}">{!! $navIcon('product') !!}<p>Products</p></a>
+                    <a href="{{ route('admin.products.index') }}" class="nav-link{{ $active('admin.products.*') }}">{!! $navIcon('product') !!}<p>{{ __('admin.products') }}</p></a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('admin.categories.index') }}" class="nav-link{{ $active('admin.categories.*') }}">{!! $navIcon('category') !!}<p>Categories</p></a>
+                    <a href="{{ route('admin.categories.index') }}" class="nav-link{{ $active('admin.categories.*') }}">{!! $navIcon('category') !!}<p>{{ __('admin.categories') }}</p></a>
                 </li>
                 <li class="nav-item">
                     <a href="{{ route('admin.brands.index') }}" class="nav-link{{ $active('admin.brands.*') }}">{!! $navIcon('brand') !!}<p>Brands</p></a>
@@ -84,10 +84,10 @@
 
                 <li class="nav-header">Sales</li>
                 <li class="nav-item">
-                    <a href="{{ route('admin.orders.index') }}" class="nav-link{{ $active('admin.orders.*') }}">{!! $navIcon('order') !!}<p>Orders</p></a>
+                    <a href="{{ route('admin.orders.index') }}" class="nav-link{{ $active('admin.orders.*') }}">{!! $navIcon('order') !!}<p>{{ __('admin.orders') }}</p></a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('admin.customers.index') }}" class="nav-link{{ $active('admin.customers.*') }}">{!! $navIcon('customer') !!}<p>Customers</p></a>
+                    <a href="{{ route('admin.customers.index') }}" class="nav-link{{ $active('admin.customers.*') }}">{!! $navIcon('customer') !!}<p>{{ __('admin.customers') }}</p></a>
                 </li>
                 <li class="nav-item">
                     <a href="{{ route('admin.coupons.index') }}" class="nav-link{{ $active('admin.coupons.*') }}">{!! $navIcon('coupon') !!}<p>Coupons</p></a>
@@ -107,7 +107,7 @@
                     <a href="{{ route('admin.menus.index') }}" class="nav-link{{ $active('admin.menus.*') }}">{!! $navIcon('menu') !!}<p>Menus</p></a>
                 </li>
 
-                <li class="nav-header">Settings</li>
+                <li class="nav-header">{{ __('admin.settings') }}</li>
                 <li class="nav-item">
                     <a href="{{ route('admin.settings.index') }}" class="nav-link{{ $active('admin.settings.*') }}">{!! $navIcon('settings') !!}<p>Store Settings</p></a>
                 </li>

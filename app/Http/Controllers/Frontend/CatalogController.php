@@ -29,7 +29,7 @@ class CatalogController extends Controller
         return view('frontend.themes.default.shop', $this->themeData(array_merge(SeoMeta::defaults(setting('catalog.shop_title', 'Shop')), [
             'title' => setting('catalog.shop_title', 'Shop'),
             'products' => $products,
-            'categories' => $this->publishedCategories(),
+            'categories' => $this->publishedTopLevelCategories(),
         ])));
     }
 
@@ -48,7 +48,7 @@ class CatalogController extends Controller
             'title' => $category->name,
             'category' => $category,
             'products' => $products,
-            'categories' => $this->publishedCategories(),
+            'categories' => $this->publishedTopLevelCategories(),
         ])));
     }
 
@@ -74,11 +74,14 @@ class CatalogController extends Controller
             ->where('status', 'published');
     }
 
-    private function publishedCategories()
+    private function publishedTopLevelCategories()
     {
         return Category::query()
             ->where('status', 'published')
-            ->with('coverImage')
+            ->whereNull('parent_id')
+            ->with(['coverImage', 'children' => function ($q) {
+                $q->where('status', 'published')->with('coverImage')->orderBy('sort_order')->orderBy('name');
+            }])
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get();

@@ -51,17 +51,17 @@
 
         @if ($product->sale_price)
             <div class="absolute left-4 top-4">
-                @include('frontend.themes.default.components.badge', ['type' => 'danger', 'text' => 'Sale'])
+                @include('frontend.themes.default.components.badge', ['type' => 'danger', 'text' => __('store.sale')])
             </div>
         @elseif ($product->featured)
             <div class="absolute left-4 top-4">
-                @include('frontend.themes.default.components.badge', ['type' => 'info', 'text' => 'Featured'])
+                @include('frontend.themes.default.components.badge', ['type' => 'info', 'text' => __('store.featured')])
             </div>
         @endif
 
         @if ($product->stock_quantity <= 0 && !$product->hasVariants())
             <div class="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-sm">
-                <span class="rounded-full bg-slate-900 px-4 py-2 text-sm font-bold text-white">Out of stock</span>
+                <span class="rounded-full bg-slate-900 px-4 py-2 text-sm font-bold text-white">{{ __('store.out_of_stock') }}</span>
             </div>
         @endif
     </a>

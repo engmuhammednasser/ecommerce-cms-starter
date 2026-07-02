@@ -48,7 +48,7 @@
                                                     'text' => ucfirst($order->status),
                                                 ])
                                             </td>
-                                            <td class="px-6 py-4 font-medium text-slate-900">${{ number_format($order->total, 2) }}</td>
+                                            <td class="px-6 py-4 font-medium text-slate-900">{{ number_format($order->total, 2) }} ج.م</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
