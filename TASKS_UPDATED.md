@@ -1451,3 +1451,52 @@ Do Not:
 - Do not overpromise unsupported production features.
 - Do not include paid assets without license notes.
 - Do not remove technical setup details.
+
+---
+
+## TASK-055: Visual Content Scheme & Integration
+
+Status: in_progress
+
+### TASK-055A: Define storefront visual content schema
+Status: done
+
+Scope:
+- Create database migration for image IDs on products, variants, categories, and page sections.
+- Update model relationships and fillable properties.
+- Add default store image settings to SettingSeeder.
+
+### TASK-055B: Build admin UI for visual content management
+Status: done
+
+Scope:
+- Added media-select partial component for reusable ID-based image selection.
+- Added main_image_id, hover_image_id, seo_image_id selects to product form.
+- Added cover_image_id, icon_image_id selects to category form.
+- Added desktop_image_id, mobile_image_id, background_image_id, image_alt, image_position, overlay_style fields to section form.
+- Added image_id select to product variant form.
+- Updated ProductController, CategoryController, SectionController, ProductVariantController with mediaOptions and validation.
+
+### TASK-055C: Add premium demo media and content seeders
+Status: done
+
+Scope:
+- Created local demo SVG assets: hero-desktop.svg, hero-mobile.svg, banner-bg.svg, product-backpack-hover.svg, product-lamp-hover.svg, product-sneakers-hover.svg.
+- Built idempotent DemoMediaSeeder registering 15 Media records from demo/ assets.
+- Assigned main_image_id, hover_image_id, seo_image_id to all 3 demo products.
+- Assigned cover_image_id, icon_image_id to Fashion and Home categories.
+- Assigned desktop_image_id, mobile_image_id, image_alt, image_position, overlay_style to hero section.
+- Assigned desktop_image_id, background_image_id, image_alt, image_position, overlay_style to banner section.
+- Seeded store.default_product_image, store.default_category_image, store.default_hero_image, store.default_og_image settings.
+
+### TASK-055D: Update storefront image rendering rules
+Status: done
+
+Scope:
+- Updated HomeController: eager-loads desktopImage, mobileImage, backgroundImage on sections; coverImage on categories; mainImage, hoverImage on featuredProducts.
+- Updated CatalogController: productQuery eager-loads mainImage, hoverImage; product detail loads mainImage, hoverImage; publishedCategories eager-loads coverImage.
+- Updated product-card.blade.php: mainImage → primaryImage → default_product_image → neutral fallback; optional hover image swap.
+- Updated category-card.blade.php: coverImage → legacy image → default_category_image → dark fallback.
+- Updated hero.blade.php: desktopImage → mobileImage → legacy image → default_hero_image; respects image_alt, image_position, overlay_style.
+- Updated banner.blade.php: backgroundImage → desktopImage → legacy image; respects image_alt, image_position, overlay_style.
+- Updated product-details.blade.php: mainImage (Media) shown first, then gallery images (legacy ProductImage), then hoverImage if no gallery, then neutral fallback.

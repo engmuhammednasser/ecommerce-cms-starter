@@ -116,9 +116,34 @@
 
             @include('admin.components.form.media-picker-input', [
                 'name' => 'seo_image',
-                'label' => 'SEO Image',
+                'label' => 'SEO Image (legacy path)',
                 'value' => $product->seo_image,
             ])
+
+            {{-- Visual Image IDs (TASK-055A) --}}
+            <div class="card card-outline card-secondary mt-3">
+                <div class="card-header"><h6 class="card-title mb-0">Visual Images (Media Library)</h6></div>
+                <div class="card-body">
+                    @include('admin.components.form.media-select', [
+                        'name' => 'main_image_id',
+                        'label' => 'Main Image',
+                        'selected' => $product->main_image_id,
+                        'mediaOptions' => $mediaOptions,
+                    ])
+                    @include('admin.components.form.media-select', [
+                        'name' => 'hover_image_id',
+                        'label' => 'Hover Image',
+                        'selected' => $product->hover_image_id,
+                        'mediaOptions' => $mediaOptions,
+                    ])
+                    @include('admin.components.form.media-select', [
+                        'name' => 'seo_image_id',
+                        'label' => 'SEO Image (Media Library)',
+                        'selected' => $product->seo_image_id,
+                        'mediaOptions' => $mediaOptions,
+                    ])
+                </div>
+            </div>
         </div>
     </div>
 

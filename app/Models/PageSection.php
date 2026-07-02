@@ -18,6 +18,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'settings',
     'sort_order',
     'is_active',
+    'desktop_image_id',
+    'mobile_image_id',
+    'background_image_id',
+    'image_alt',
+    'image_position',
+    'overlay_style',
 ])]
 class PageSection extends Model
 {
@@ -52,5 +58,29 @@ class PageSection extends Model
     public function typeLabel(): string
     {
         return self::TYPES[$this->type] ?? ucfirst(str_replace('_', ' ', $this->type));
+    }
+
+    /**
+     * @return BelongsTo<Media, $this>
+     */
+    public function desktopImage(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'desktop_image_id');
+    }
+
+    /**
+     * @return BelongsTo<Media, $this>
+     */
+    public function mobileImage(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'mobile_image_id');
+    }
+
+    /**
+     * @return BelongsTo<Media, $this>
+     */
+    public function backgroundImage(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'background_image_id');
     }
 }

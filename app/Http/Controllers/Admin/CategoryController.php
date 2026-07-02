@@ -41,6 +41,7 @@ class CategoryController extends Controller
         return view('admin.categories.create', [
             'category' => new Category(['status' => 'draft', 'sort_order' => 0]),
             'parentOptions' => $this->parentOptions(),
+            'mediaOptions' => \App\Models\Media::query()->where('mime_type', 'like', 'image/%')->orderBy('original_name')->pluck('original_name', 'id')->all(),
         ]);
     }
 
@@ -66,6 +67,7 @@ class CategoryController extends Controller
         return view('admin.categories.edit', [
             'category' => $category,
             'parentOptions' => $this->parentOptions($category),
+            'mediaOptions' => \App\Models\Media::query()->where('mime_type', 'like', 'image/%')->orderBy('original_name')->pluck('original_name', 'id')->all(),
         ]);
     }
 
@@ -121,6 +123,8 @@ class CategoryController extends Controller
             'seo_title' => ['nullable', 'string', 'max:255'],
             'seo_description' => ['nullable', 'string', 'max:500'],
             'seo_image' => ['nullable', 'string', 'max:255'],
+            'cover_image_id' => ['nullable', 'integer', Rule::exists('media', 'id')],
+            'icon_image_id' => ['nullable', 'integer', Rule::exists('media', 'id')],
         ]);
     }
 

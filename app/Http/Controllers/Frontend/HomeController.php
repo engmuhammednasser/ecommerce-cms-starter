@@ -20,6 +20,7 @@ class HomeController extends Controller
         $sections = PageSection::query()
             ->where('is_active', true)
             ->when($home, fn ($query) => $query->where('page_id', $home->id))
+            ->with('desktopImage', 'mobileImage', 'backgroundImage')
             ->orderBy('sort_order')
             ->get();
 
@@ -29,9 +30,10 @@ class HomeController extends Controller
                 ->where('status', 'published')
                 ->orderBy('sort_order')
                 ->orderBy('name')
+                ->with('coverImage')
                 ->get(),
             'featuredProducts' => Product::query()
-                ->with('category', 'primaryImage')
+                ->with('category', 'primaryImage', 'mainImage', 'hoverImage')
                 ->where('status', 'published')
                 ->where('featured', true)
                 ->latest()

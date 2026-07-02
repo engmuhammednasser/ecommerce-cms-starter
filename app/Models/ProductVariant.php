@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
     'image',
     'status',
     'sort_order',
+    'image_id',
 ])]
 class ProductVariant extends Model
 {
@@ -80,5 +81,14 @@ class ProductVariant extends Model
             ->implode(', ');
 
         return $label ?: 'Variant #' . $this->id;
+    }
+
+    /**
+     * @return BelongsTo<Media, $this>
+     */
+    public function visualImage(): BelongsTo
+    {
+        // Named visualImage to not conflict with the existing 'image' string column
+        return $this->belongsTo(Media::class, 'image_id');
     }
 }

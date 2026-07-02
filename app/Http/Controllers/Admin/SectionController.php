@@ -44,6 +44,7 @@ class SectionController extends Controller
         return view('admin.sections.create', [
             'section' => new PageSection(['is_active' => true, 'sort_order' => 0]),
             'pages' => $this->pageOptions(),
+            'mediaOptions' => \App\Models\Media::query()->where('mime_type', 'like', 'image/%')->orderBy('original_name')->pluck('original_name', 'id')->all(),
         ]);
     }
 
@@ -68,6 +69,7 @@ class SectionController extends Controller
         return view('admin.sections.edit', [
             'section' => $section,
             'pages' => $this->pageOptions(),
+            'mediaOptions' => \App\Models\Media::query()->where('mime_type', 'like', 'image/%')->orderBy('original_name')->pluck('original_name', 'id')->all(),
         ]);
     }
 
@@ -117,6 +119,12 @@ class SectionController extends Controller
             'settings' => ['nullable', 'json'],
             'sort_order' => ['required', 'integer', 'min:0'],
             'is_active' => ['nullable', 'boolean'],
+            'desktop_image_id' => ['nullable', 'integer', Rule::exists('media', 'id')],
+            'mobile_image_id' => ['nullable', 'integer', Rule::exists('media', 'id')],
+            'background_image_id' => ['nullable', 'integer', Rule::exists('media', 'id')],
+            'image_alt' => ['nullable', 'string', 'max:255'],
+            'image_position' => ['nullable', 'string', Rule::in(['left', 'right', 'center', 'top', 'bottom'])],
+            'overlay_style' => ['nullable', 'string', Rule::in(['dark', 'light', 'gradient', 'none'])],
         ]);
 
         $validated['is_active'] = $request->boolean('is_active');

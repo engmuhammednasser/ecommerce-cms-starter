@@ -77,6 +77,25 @@
                 'label' => 'SEO Image',
                 'value' => $category->seo_image,
             ])
+
+            {{-- Visual Image IDs (TASK-055A) --}}
+            <div class="card card-outline card-secondary mt-3">
+                <div class="card-header"><h6 class="card-title mb-0">Visual Images (Media Library)</h6></div>
+                <div class="card-body">
+                    @include('admin.components.form.media-select', [
+                        'name' => 'cover_image_id',
+                        'label' => 'Cover Image',
+                        'selected' => $category->cover_image_id,
+                        'mediaOptions' => $mediaOptions,
+                    ])
+                    @include('admin.components.form.media-select', [
+                        'name' => 'icon_image_id',
+                        'label' => 'Icon Image',
+                        'selected' => $category->icon_image_id,
+                        'mediaOptions' => $mediaOptions,
+                    ])
+                </div>
+            </div>
         </div>
     </div>
 

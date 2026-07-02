@@ -21,7 +21,11 @@ class ProductVariantController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        return view('admin.product-variants.create', compact('product', 'attributes'));
+        return view('admin.product-variants.create', [
+            'product' => $product,
+            'attributes' => $attributes,
+            'mediaOptions' => \App\Models\Media::query()->where('mime_type', 'like', 'image/%')->orderBy('original_name')->pluck('original_name', 'id')->all(),
+        ]);
     }
 
     public function store(Request $request, Product $product): RedirectResponse
@@ -35,6 +39,7 @@ class ProductVariantController extends Controller
             'sort_order' => ['nullable', 'integer'],
             'attribute_value_ids' => ['nullable', 'array'],
             'attribute_value_ids.*' => ['integer', 'exists:attribute_values,id'],
+            'image_id' => ['nullable', 'integer', Rule::exists('media', 'id')],
         ]);
 
         $attributeValueIds = $validated['attribute_value_ids'] ?? [];
@@ -60,7 +65,13 @@ class ProductVariantController extends Controller
 
         $selectedValueIds = $variant->attributeValues->pluck('id')->all();
 
-        return view('admin.product-variants.edit', compact('product', 'variant', 'attributes', 'selectedValueIds'));
+        return view('admin.product-variants.edit', [
+            'product' => $product,
+            'variant' => $variant,
+            'attributes' => $attributes,
+            'selectedValueIds' => $selectedValueIds,
+            'mediaOptions' => \App\Models\Media::query()->where('mime_type', 'like', 'image/%')->orderBy('original_name')->pluck('original_name', 'id')->all(),
+        ]);
     }
 
     public function update(Request $request, Product $product, ProductVariant $variant): RedirectResponse
@@ -74,6 +85,7 @@ class ProductVariantController extends Controller
             'sort_order' => ['nullable', 'integer'],
             'attribute_value_ids' => ['nullable', 'array'],
             'attribute_value_ids.*' => ['integer', 'exists:attribute_values,id'],
+            'image_id' => ['nullable', 'integer', Rule::exists('media', 'id')],
         ]);
 
         $attributeValueIds = $validated['attribute_value_ids'] ?? [];

@@ -56,7 +56,7 @@ class CatalogController extends Controller
     {
         abort_unless($product->status === 'published', 404);
 
-        $product->load('category', 'images', 'variants.attributeValues.attribute');
+        $product->load('category', 'images', 'mainImage', 'hoverImage', 'variants.attributeValues.attribute');
 
         $activeVariants = $product->variants->where('status', 'active')->values();
 
@@ -70,7 +70,7 @@ class CatalogController extends Controller
     private function productQuery(): Builder
     {
         return Product::query()
-            ->with('category', 'primaryImage')
+            ->with('category', 'primaryImage', 'mainImage', 'hoverImage')
             ->where('status', 'published');
     }
 
@@ -78,6 +78,7 @@ class CatalogController extends Controller
     {
         return Category::query()
             ->where('status', 'published')
+            ->with('coverImage')
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get();

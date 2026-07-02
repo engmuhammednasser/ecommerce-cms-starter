@@ -18,18 +18,48 @@
         ])->toJson();
     @endphp
 
+    @php
+        /**
+         * Product detail image rendering (TASK-055D):
+         * 1. mainImage — Media record
+         * 2. gallery images (ProductImage records)
+         * 3. hoverImage shown as second image if no gallery
+         * 4. Compact neutral fallback
+         */
+        $mainMediaImage = ($product->relationLoaded('mainImage') && $product->mainImage) ? $product->mainImage : null;
+        $galleryImages  = $product->images ?? collect();
+        $hoverMediaImage = ($product->relationLoaded('hoverImage') && $product->hoverImage) ? $product->hoverImage : null;
+    @endphp
+
     <article class="mx-auto grid max-w-6xl gap-10 px-6 py-10 lg:grid-cols-[1.05fr_0.95fr]">
-        <div class="space-y-4">
-            @forelse ($product->images as $image)
-                <div class="aspect-[4/3] overflow-hidden rounded-3xl border border-slate-200 bg-slate-100 shadow-sm">
-                    <img src="{{ asset('storage/' . $image->path) }}" alt="{{ $image->alt_text ?: $product->name }}" class="h-full w-full object-cover">
-                </div>
-            @empty
-                <div class="flex aspect-[4/3] items-center justify-center rounded-3xl border border-slate-200 bg-white text-slate-500 shadow-sm">
-                    {{ setting('catalog.no_product_image_label', 'No image available') }}
-                </div>
-            @endforelse
-        </div>
+    <div class="space-y-4">
+        {{-- Main image (Media library) takes first slot --}}
+        @if ($mainMediaImage)
+            <div class="aspect-[4/3] overflow-hidden rounded-3xl border border-slate-200 bg-slate-100 shadow-sm">
+                <img src="{{ $mainMediaImage->url() }}" alt="{{ $product->name }}" class="h-full w-full object-cover">
+            </div>
+        @endif
+
+        {{-- Gallery images (legacy ProductImage) --}}
+        @forelse ($galleryImages as $image)
+            <div class="aspect-[4/3] overflow-hidden rounded-3xl border border-slate-200 bg-slate-100 shadow-sm">
+                <img src="{{ asset('storage/' . $image->path) }}" alt="{{ $image->alt_text ?: $product->name }}" class="h-full w-full object-cover">
+            </div>
+        @empty
+            {{-- If no mainImage either, show hover image or fallback --}}
+            @if (!$mainMediaImage)
+                @if ($hoverMediaImage)
+                    <div class="aspect-[4/3] overflow-hidden rounded-3xl border border-slate-200 bg-slate-100 shadow-sm">
+                        <img src="{{ $hoverMediaImage->url() }}" alt="{{ $product->name }}" class="h-full w-full object-cover">
+                    </div>
+                @else
+                    <div class="flex aspect-[4/3] items-center justify-center rounded-3xl border border-slate-200 bg-slate-100 text-slate-400 text-sm shadow-sm">
+                        {{ setting('catalog.no_product_image_label', 'No image available') }}
+                    </div>
+                @endif
+            @endif
+        @endforelse
+    </div>
 
         <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm lg:p-8">
             @if ($product->category)

@@ -18,6 +18,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'seo_title',
     'seo_description',
     'seo_image',
+    'cover_image_id',
+    'icon_image_id',
 ])]
 class Category extends Model
 {
@@ -56,5 +58,21 @@ class Category extends Model
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
+    }
+
+    /**
+     * @return BelongsTo<Media, $this>
+     */
+    public function coverImage(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'cover_image_id');
+    }
+
+    /**
+     * @return BelongsTo<Media, $this>
+     */
+    public function iconImage(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'icon_image_id');
     }
 }

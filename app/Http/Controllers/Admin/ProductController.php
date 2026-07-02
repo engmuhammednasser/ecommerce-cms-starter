@@ -62,6 +62,7 @@ class ProductController extends Controller
             ]),
             'brandOptions' => $this->brandOptions(),
             'categoryOptions' => $this->categoryOptions(),
+            'mediaOptions' => \App\Models\Media::query()->where('mime_type', 'like', 'image/%')->orderBy('original_name')->pluck('original_name', 'id')->all(),
             'imagePaths' => '',
         ]);
     }
@@ -93,6 +94,7 @@ class ProductController extends Controller
             'product' => $product,
             'brandOptions' => $this->brandOptions(),
             'categoryOptions' => $this->categoryOptions(),
+            'mediaOptions' => \App\Models\Media::query()->where('mime_type', 'like', 'image/%')->orderBy('original_name')->pluck('original_name', 'id')->all(),
             'imagePaths' => $product->images->pluck('path')->implode(PHP_EOL),
         ]);
     }
@@ -146,6 +148,9 @@ class ProductController extends Controller
             'seo_title' => ['nullable', 'string', 'max:255'],
             'seo_description' => ['nullable', 'string', 'max:500'],
             'seo_image' => ['nullable', 'string', 'max:255'],
+            'main_image_id' => ['nullable', 'integer', Rule::exists('media', 'id')],
+            'hover_image_id' => ['nullable', 'integer', Rule::exists('media', 'id')],
+            'seo_image_id' => ['nullable', 'integer', Rule::exists('media', 'id')],
             'image_paths' => ['nullable', 'string'],
         ]);
 

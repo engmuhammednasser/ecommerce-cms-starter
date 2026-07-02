@@ -77,3 +77,11 @@
     'required' => true,
     'options' => \App\Models\ProductVariant::STATUSES,
 ])
+
+{{-- Visual Image (TASK-055A) --}}
+@include('admin.components.form.media-select', [
+    'name' => 'image_id',
+    'label' => 'Variant Image (Media Library)',
+    'selected' => old('image_id', $variant->image_id ?? null),
+    'mediaOptions' => $mediaOptions,
+])

@@ -46,6 +46,10 @@ class SettingSeeder extends Seeder
         ['group' => 'shipping', 'key' => 'free_shipping_threshold', 'value' => null, 'type' => 'number'],
         ['group' => 'tax', 'key' => 'percentage', 'value' => '0', 'type' => 'number'],
         ['group' => 'inventory', 'key' => 'low_stock_threshold', 'value' => '5', 'type' => 'number'],
+        ['group' => 'store', 'key' => 'default_product_image', 'value' => null, 'type' => 'image'],
+        ['group' => 'store', 'key' => 'default_category_image', 'value' => null, 'type' => 'image'],
+        ['group' => 'store', 'key' => 'default_hero_image', 'value' => null, 'type' => 'image'],
+        ['group' => 'store', 'key' => 'default_og_image', 'value' => null, 'type' => 'image'],
     ];
 
     public function run(): void

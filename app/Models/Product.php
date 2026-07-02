@@ -24,6 +24,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
     'seo_title',
     'seo_description',
     'seo_image',
+    'main_image_id',
+    'hover_image_id',
+    'seo_image_id',
 ])]
 class Product extends Model
 {
@@ -89,5 +92,29 @@ class Product extends Model
     public function hasVariants(): bool
     {
         return $this->variants()->where('status', 'active')->exists();
+    }
+
+    /**
+     * @return BelongsTo<Media, $this>
+     */
+    public function mainImage(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'main_image_id');
+    }
+
+    /**
+     * @return BelongsTo<Media, $this>
+     */
+    public function hoverImage(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'hover_image_id');
+    }
+
+    /**
+     * @return BelongsTo<Media, $this>
+     */
+    public function seoImage(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'seo_image_id');
     }
 }
