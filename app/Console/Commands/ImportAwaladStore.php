@@ -67,8 +67,11 @@ class ImportAwaladStore extends Command
 
         $created = 0;
         $updated = 0;
+        $oldIdToSlug = [];
 
+        // Pass 1: Ensure all categories exist
         foreach ($oldCategories as $old) {
+            $oldIdToSlug[$old->id] = $old->slug;
             if (!$dryRun) {
                 $category = Category::where('slug', $old->slug)->first();
                 if ($category) {
@@ -76,7 +79,6 @@ class ImportAwaladStore extends Command
                         'name' => $old->name,
                         'description' => $old->description,
                         'status' => $old->is_active ? 'published' : 'draft',
-                        // parent mapping deferred to avoid complexity
                     ]);
                     $updated++;
                 } else {
@@ -97,7 +99,22 @@ class ImportAwaladStore extends Command
             }
         }
 
-        $this->info("Categories: Created {$created}, Updated {$updated}.");
+        // Pass 2: Establish parent relationships
+        if (!$dryRun) {
+            foreach ($oldCategories as $old) {
+                if ($old->parent_id && isset($oldIdToSlug[$old->parent_id])) {
+                    $parentSlug = $oldIdToSlug[$old->parent_id];
+                    $parentCat = Category::where('slug', $parentSlug)->first();
+                    $childCat = Category::where('slug', $old->slug)->first();
+                    
+                    if ($parentCat && $childCat && $childCat->parent_id !== $parentCat->id) {
+                        $childCat->update(['parent_id' => $parentCat->id]);
+                    }
+                }
+            }
+        }
+
+        $this->info("Categories: Created {$created}, Updated {$updated}. (Parent hierarchies processed)");
     }
 
     private function importProducts(bool $dryRun): void
